@@ -82,6 +82,24 @@
 
     nav ul a:hover { color: var(--cyan); text-shadow: var(--glow-c); }
 
+    .lang-btn {
+      background: transparent;
+      border: 1px solid rgba(0,212,255,.4);
+      color: var(--cyan);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .25s;
+      letter-spacing: 1px;
+    }
+    .lang-btn:hover {
+      background: rgba(0,212,255,.1);
+      border-color: var(--cyan);
+      box-shadow: var(--glow-c);
+    }
+
     /* ── HERO ── */
     .hero {
       position: relative;
@@ -607,11 +625,12 @@
     <img src="logo-white.png" alt="REI Games Studio" />
   </div>
   <ul>
-    <li><a href="#games">משחקים</a></li>
-    <li><a href="#about">עלינו</a></li>
-    <li><a href="#trailer">טריילר</a></li>
-    <li><a href="#contact">צור קשר</a></li>
+    <li><a href="#games" data-i18n="nav_games">משחקים</a></li>
+    <li><a href="#about" data-i18n="nav_about">עלינו</a></li>
+    <li><a href="#trailer" data-i18n="nav_trailer">טריילר</a></li>
+    <li><a href="#contact" data-i18n="nav_contact">צור קשר</a></li>
   </ul>
+  <button class="lang-btn" onclick="toggleLang()">🌐 EN</button>
 </nav>
 
 <!-- ── HERO ── -->
@@ -622,35 +641,35 @@
     <div class="hero-badge">⚡ IMAGINE · BUILD · PLAY</div>
 
     <h1>
-      <span class="white">ברוכים הבאים ל-</span><br />
+      <span class="white" data-i18n="hero_welcome">ברוכים הבאים ל-</span><br />
       <span class="cyan">REI</span>
       <span class="purple">⚡</span>
       <span class="white">GAMES</span><br />
       <span class="white">STUDIO</span>
     </h1>
 
-    <p class="hero-sub">
+    <p class="hero-sub" data-i18n="hero_sub">
       עולם של משחקים שנבנו מדמיון טהור.<br />
       כל משחק הוא הרפתקה חדשה — מוכן לשחק?
     </p>
 
     <div class="hero-btns">
-      <a href="#games" class="btn btn-primary">🎮 שחק עכשיו</a>
-      <a href="#about" class="btn btn-secondary">👾 הסיפור שלנו</a>
+      <a href="#games" class="btn btn-primary" data-i18n="hero_btn_play">🎮 שחק עכשיו</a>
+      <a href="#about" class="btn btn-secondary" data-i18n="hero_btn_about">👾 הסיפור שלנו</a>
     </div>
 
     <div class="hero-stats">
       <div class="stat-item">
         <div class="stat-num">3+</div>
-        <div class="stat-label">משחקים</div>
+        <div class="stat-label" data-i18n="stat_games">משחקים</div>
       </div>
       <div class="stat-item">
         <div class="stat-num">∞</div>
-        <div class="stat-label">כיף</div>
+        <div class="stat-label" data-i18n="stat_fun">כיף</div>
       </div>
       <div class="stat-item">
         <div class="stat-num">100%</div>
-        <div class="stat-label">עשוי באהבה</div>
+        <div class="stat-label" data-i18n="stat_love">עשוי באהבה</div>
       </div>
     </div>
   </div>
@@ -664,73 +683,61 @@
 <!-- ── GAMES ── -->
 <section id="games">
   <div class="section-title">
-    <h2>המשחקים <span>שלנו</span></h2>
+    <h2 data-i18n="games_title">המשחקים <span>שלנו</span></h2>
     <div class="divider"></div>
-    <p>בחר משחק ותתחיל את ההרפתקה</p>
+    <p data-i18n="games_sub">בחר משחק ותתחיל את ההרפתקה</p>
   </div>
 
   <div class="games-grid">
 
     <!-- Game 1 -->
     <div class="game-card">
-      <div class="game-thumb">
-        🧟
-        <div class="game-tag">LIVE</div>
-      </div>
+      <div class="game-thumb">🧟<div class="game-tag">LIVE</div></div>
       <div class="game-info">
         <h3>Zombie Slayer</h3>
-        <p>שרוד את היער, מצא אוצרות והביס את הבוס! WASD לתנועה, לחיצה להחרבה.</p>
+        <p data-i18n="game1_desc">שרוד את היער, מצא אוצרות והביס את הבוס! WASD לתנועה, לחיצה להחרבה.</p>
         <div class="game-footer">
           <span class="game-rating">⭐⭐⭐⭐⭐</span>
-          <button class="play-btn" onclick="window.location='zombie-slayer/index.html'">שחק ▶</button>
+          <button class="play-btn" data-i18n="play" onclick="window.location='zombie-slayer/index.html'">שחק ▶</button>
         </div>
       </div>
     </div>
 
     <!-- Game 2 -->
     <div class="game-card coming-soon">
-      <div class="game-thumb">
-        🏎️
-        <div class="game-tag coming-tag">בקרוב</div>
-      </div>
+      <div class="game-thumb">🏎️<div class="game-tag coming-tag" data-i18n="coming_soon">בקרוב</div></div>
       <div class="game-info">
         <h3>Turbo Pixel</h3>
-        <p>מירוץ פיקסל-ארט בשמונה מסלולים שונים עם שדרוגי טורבו.</p>
+        <p data-i18n="game2_desc">מירוץ פיקסל-ארט בשמונה מסלולים שונים עם שדרוגי טורבו.</p>
         <div class="game-footer">
-          <span class="game-rating">🔒 Coming Soon</span>
-          <button class="play-btn" style="opacity:.5;cursor:default">בקרוב</button>
+          <span class="game-rating">🔒 <span data-i18n="coming_soon">בקרוב</span></span>
+          <button class="play-btn" style="opacity:.5;cursor:default" data-i18n="coming_soon">בקרוב</button>
         </div>
       </div>
     </div>
 
     <!-- Game 3 -->
     <div class="game-card coming-soon">
-      <div class="game-thumb">
-        ⚔️
-        <div class="game-tag coming-tag">בקרוב</div>
-      </div>
+      <div class="game-thumb">⚔️<div class="game-tag coming-tag" data-i18n="coming_soon">בקרוב</div></div>
       <div class="game-info">
         <h3>Dungeon REI</h3>
-        <p>dungeon crawler עם אריחים, מפלצות וניצחונות אגדיים.</p>
+        <p data-i18n="game3_desc">dungeon crawler עם אריחים, מפלצות וניצחונות אגדיים.</p>
         <div class="game-footer">
-          <span class="game-rating">🔒 Coming Soon</span>
-          <button class="play-btn" style="opacity:.5;cursor:default">בקרוב</button>
+          <span class="game-rating">🔒 <span data-i18n="coming_soon">בקרוב</span></span>
+          <button class="play-btn" style="opacity:.5;cursor:default" data-i18n="coming_soon">בקרוב</button>
         </div>
       </div>
     </div>
 
-    <!-- Game 4 – placeholder add -->
+    <!-- Game 4 -->
     <div class="game-card coming-soon">
-      <div class="game-thumb">
-        🌌
-        <div class="game-tag coming-tag">בקרוב</div>
-      </div>
+      <div class="game-thumb">🌌<div class="game-tag coming-tag" data-i18n="coming_soon">בקרוב</div></div>
       <div class="game-info">
         <h3>Space Pixel</h3>
-        <p>ירי חלל קלאסי עם גלים, בוסים ונשק מתקדם.</p>
+        <p data-i18n="game4_desc">ירי חלל קלאסי עם גלים, בוסים ונשק מתקדם.</p>
         <div class="game-footer">
-          <span class="game-rating">🔒 Coming Soon</span>
-          <button class="play-btn" style="opacity:.5;cursor:default">בקרוב</button>
+          <span class="game-rating">🔒 <span data-i18n="coming_soon">בקרוב</span></span>
+          <button class="play-btn" style="opacity:.5;cursor:default" data-i18n="coming_soon">בקרוב</button>
         </div>
       </div>
     </div>
@@ -745,35 +752,16 @@
       <img src="hero-chars.png" alt="REI Games Team" />
     </div>
     <div class="about-text">
-      <h2>הסיפור <span>שלנו</span></h2>
-      <p>
-        REI Games Studio נולד מחלום אחד פשוט: לבנות משחקים שאתה בעצמך רוצה לשחק בהם.
-      </p>
-      <p>
-        כל משחק שאנחנו בונים מגיע מדמיון, יצירתיות ואהבה אמיתית לגיימינג.
-        מ-Brawl Stars ועד אפקטים מיוחדים — אנחנו לא מפסיקים לחלום ולבנות.
-      </p>
-      <p>
-        הסטודיו של רעי הוא מקום שבו כל רעיון הופך למציאות — פיקסל אחד בכל פעם.
-      </p>
+      <h2 data-i18n="about_title">הסיפור <span>שלנו</span></h2>
+      <p data-i18n="about_p1">REI Games Studio נולד מחלום אחד פשוט: לבנות משחקים שאתה בעצמך רוצה לשחק בהם.</p>
+      <p data-i18n="about_p2">כל משחק שאנחנו בונים מגיע מדמיון, יצירתיות ואהבה אמיתית לגיימינג. מ-Brawl Stars ועד אפקטים מיוחדים — אנחנו לא מפסיקים לחלום ולבנות.</p>
+      <p data-i18n="about_p3">הסטודיו של רעי הוא מקום שבו כל רעיון הופך למציאות — פיקסל אחד בכל פעם.</p>
 
       <div class="features">
-        <div class="feature-item">
-          <div class="feature-icon">🎮</div>
-          משחקים מקוריים
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">⚡</div>
-          עדכונים מהירים
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">🐶</div>
-          צוות מנצח
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">🌟</div>
-          חוויה מדהימה
-        </div>
+        <div class="feature-item"><div class="feature-icon">🎮</div><span data-i18n="feat1">משחקים מקוריים</span></div>
+        <div class="feature-item"><div class="feature-icon">⚡</div><span data-i18n="feat2">עדכונים מהירים</span></div>
+        <div class="feature-item"><div class="feature-icon">🐶</div><span data-i18n="feat3">צוות מנצח</span></div>
+        <div class="feature-item"><div class="feature-icon">🌟</div><span data-i18n="feat4">חוויה מדהימה</span></div>
       </div>
     </div>
   </div>
@@ -782,17 +770,15 @@
 <!-- ── TRAILER ── -->
 <section id="trailer">
   <div class="section-title">
-    <h2>טריילר <span>רשמי</span></h2>
+    <h2 data-i18n="trailer_title">טריילר <span>רשמי</span></h2>
     <div class="divider"></div>
-    <p>קצת טעימה ממה שמחכה לך</p>
+    <p data-i18n="trailer_sub">קצת טעימה ממה שמחכה לך</p>
   </div>
 
   <div class="video-wrapper">
-    <!-- Replace src with your YouTube embed URL -->
-    <!-- Example: <iframe width="100%" height="100%" src="https://www.youtube.com/embed/YOUR_VIDEO_ID" frameborder="0" allowfullscreen></iframe> -->
     <div class="video-placeholder">
       <div class="play-icon">▶</div>
-      <p style="font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px;">הטריילר בקרוב...</p>
+      <p data-i18n="trailer_soon" style="font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px;">הטריילר בקרוב...</p>
     </div>
   </div>
 </section>
@@ -800,12 +786,12 @@
 <!-- ── CONTACT ── -->
 <section id="contact">
   <div class="section-title">
-    <h2>בואו <span>נדבר</span></h2>
+    <h2 data-i18n="contact_title">בואו <span>נדבר</span></h2>
     <div class="divider"></div>
   </div>
 
   <div class="contact-card">
-    <p>
+    <p data-i18n="contact_p">
       שאלות? רעיונות? רוצים לשתף פעולה?<br />
       אנחנו תמיד שמחים לשמוע!
     </p>
@@ -846,6 +832,70 @@
       animation-delay: ${Math.random() * 10}s;
     `;
     container.appendChild(p);
+  }
+
+  // ── TRANSLATIONS ──────────────────────────────────────────
+  const translations = {
+    he: {
+      nav_games: 'משחקים', nav_about: 'עלינו', nav_trailer: 'טריילר', nav_contact: 'צור קשר',
+      hero_welcome: 'ברוכים הבאים ל-',
+      hero_sub: 'עולם של משחקים שנבנו מדמיון טהור.<br />כל משחק הוא הרפתקה חדשה — מוכן לשחק?',
+      hero_btn_play: '🎮 שחק עכשיו', hero_btn_about: '👾 הסיפור שלנו',
+      stat_games: 'משחקים', stat_fun: 'כיף', stat_love: 'עשוי באהבה',
+      games_title: 'המשחקים <span>שלנו</span>', games_sub: 'בחר משחק ותתחיל את ההרפתקה',
+      game1_desc: 'שרוד את היער, מצא אוצרות והביס את הבוס! WASD לתנועה, לחיצה להחרבה.',
+      play: 'שחק ▶', coming_soon: 'בקרוב',
+      game2_desc: 'מירוץ פיקסל-ארט בשמונה מסלולים שונים עם שדרוגי טורבו.',
+      game3_desc: 'dungeon crawler עם אריחים, מפלצות וניצחונות אגדיים.',
+      game4_desc: 'ירי חלל קלאסי עם גלים, בוסים ונשק מתקדם.',
+      about_title: 'הסיפור <span>שלנו</span>',
+      about_p1: 'REI Games Studio נולד מחלום אחד פשוט: לבנות משחקים שאתה בעצמך רוצה לשחק בהם.',
+      about_p2: 'כל משחק שאנחנו בונים מגיע מדמיון, יצירתיות ואהבה אמיתית לגיימינג. מ-Brawl Stars ועד אפקטים מיוחדים — אנחנו לא מפסיקים לחלום ולבנות.',
+      about_p3: 'הסטודיו של רעי הוא מקום שבו כל רעיון הופך למציאות — פיקסל אחד בכל פעם.',
+      feat1: 'משחקים מקוריים', feat2: 'עדכונים מהירים', feat3: 'צוות מנצח', feat4: 'חוויה מדהימה',
+      trailer_title: 'טריילר <span>רשמי</span>', trailer_sub: 'קצת טעימה ממה שמחכה לך', trailer_soon: 'הטריילר בקרוב...',
+      contact_title: 'בואו <span>נדבר</span>',
+      contact_p: 'שאלות? רעיונות? רוצים לשתף פעולה?<br />אנחנו תמיד שמחים לשמוע!',
+    },
+    en: {
+      nav_games: 'Games', nav_about: 'About', nav_trailer: 'Trailer', nav_contact: 'Contact',
+      hero_welcome: 'Welcome to',
+      hero_sub: 'A world of games built from pure imagination.<br />Every game is a new adventure — ready to play?',
+      hero_btn_play: '🎮 Play Now', hero_btn_about: '👾 Our Story',
+      stat_games: 'Games', stat_fun: 'Fun', stat_love: 'Made with love',
+      games_title: 'Our <span>Games</span>', games_sub: 'Pick a game and start the adventure',
+      game1_desc: 'Survive the forest, find treasure, defeat the Boss! WASD to move, click to swing.',
+      play: 'Play ▶', coming_soon: 'Coming Soon',
+      game2_desc: 'Pixel-art racing across eight tracks with turbo upgrades.',
+      game3_desc: 'A tile-based dungeon crawler with monsters and legendary victories.',
+      game4_desc: 'Classic space shooter with waves, bosses and advanced weapons.',
+      about_title: 'Our <span>Story</span>',
+      about_p1: 'REI Games Studio was born from one simple dream: to build games you actually want to play.',
+      about_p2: 'Every game we build comes from imagination, creativity and a real love for gaming. We never stop dreaming and building.',
+      about_p3: "Rei's studio is a place where every idea becomes reality — one pixel at a time.",
+      feat1: 'Original Games', feat2: 'Fast Updates', feat3: 'Winning Team', feat4: 'Amazing Experience',
+      trailer_title: 'Official <span>Trailer</span>', trailer_sub: 'A little taste of what awaits you', trailer_soon: 'Trailer coming soon...',
+      contact_title: "Let's <span>Talk</span>",
+      contact_p: 'Questions? Ideas? Want to collaborate?<br />We always love to hear from you!',
+    }
+  };
+
+  let currentLang = 'he';
+
+  function setLang(lang) {
+    currentLang = lang;
+    const t = translations[lang];
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if (t[key] !== undefined) el.innerHTML = t[key];
+    });
+    document.querySelector('.lang-btn').textContent = lang === 'he' ? '🌐 EN' : '🌐 עב';
+  }
+
+  function toggleLang() {
+    setLang(currentLang === 'he' ? 'en' : 'he');
   }
 
   // Smooth nav highlight
