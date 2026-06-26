@@ -499,16 +499,16 @@
     }
 
     /* ── TRAILER ── */
-    #trailer { text-align: center; }
+    #trailer { text-align: center; background: var(--dark); }
 
     .video-wrapper {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
-      border-radius: 20px;
+      border-radius: 16px;
       overflow: hidden;
-      border: 2px solid rgba(0,212,255,.3);
-      box-shadow: 0 0 60px rgba(0,212,255,.2);
-      background: var(--card);
+      border: none;
+      box-shadow: 0 0 80px rgba(0,212,255,.15), 0 0 40px rgba(155,77,255,.1);
+      background: #000;
       aspect-ratio: 16/9;
       display: flex;
       align-items: center;
@@ -834,9 +834,14 @@
     <p data-i18n="trailer_sub">קצת טעימה ממה שמחכה לך</p>
   </div>
 
-  <div class="video-wrapper">
-    <iframe src="trailer.html" frameborder="0" allowfullscreen
-      style="width:100%;height:100%;border:none;border-radius:18px;"></iframe>
+  <div class="video-wrapper" id="trailer-wrapper">
+    <!-- Mobile: show play button; Desktop: load iframe -->
+    <div id="trailer-mobile-btn" style="display:none;flex-direction:column;align-items:center;gap:20px;">
+      <div class="play-icon" onclick="window.open('trailer.html','_blank')" style="width:100px;height:100px;font-size:40px;">▶</div>
+      <p style="color:#aab;font-size:16px;" data-i18n="trailer_tap">לחץ לצפייה בטריילר</p>
+    </div>
+    <iframe id="trailer-iframe" src="" frameborder="0" allowfullscreen
+      style="width:100%;height:100%;border:none;border-radius:18px;display:none;"></iframe>
   </div>
 </section>
 
@@ -920,7 +925,7 @@
       about_p2: 'כל משחק שאנחנו בונים מגיע מדמיון, יצירתיות ואהבה אמיתית לגיימינג. מ-Brawl Stars ועד אפקטים מיוחדים — אנחנו לא מפסיקים לחלום ולבנות.',
       about_p3: 'הסטודיו של רעי הוא מקום שבו כל רעיון הופך למציאות — פיקסל אחד בכל פעם.',
       feat1: 'משחקים מקוריים', feat2: 'עדכונים מהירים', feat3: 'צוות מנצח', feat4: 'חוויה מדהימה',
-      trailer_title: 'טריילר <span>רשמי</span>', trailer_sub: 'קצת טעימה ממה שמחכה לך', trailer_soon: 'הטריילר בקרוב...',
+      trailer_title: 'טריילר <span>רשמי</span>', trailer_sub: 'קצת טעימה ממה שמחכה לך', trailer_soon: 'הטריילר בקרוב...', trailer_tap: 'לחץ לצפייה בטריילר',
       contact_title: 'בואו <span>נדבר</span>',
       contact_p: 'שאלות? רעיונות? רוצים לשתף פעולה?<br />אנחנו תמיד שמחים לשמוע!',
     },
@@ -941,7 +946,7 @@
       about_p2: 'Every game we build comes from imagination, creativity and a real love for gaming. We never stop dreaming and building.',
       about_p3: "Rei's studio is a place where every idea becomes reality — one pixel at a time.",
       feat1: 'Original Games', feat2: 'Fast Updates', feat3: 'Winning Team', feat4: 'Amazing Experience',
-      trailer_title: 'Official <span>Trailer</span>', trailer_sub: 'A little taste of what awaits you', trailer_soon: 'Trailer coming soon...',
+      trailer_title: 'Official <span>Trailer</span>', trailer_sub: 'A little taste of what awaits you', trailer_soon: 'Trailer coming soon...', trailer_tap: 'Tap to watch the trailer',
       contact_title: "Let's <span>Talk</span>",
       contact_p: 'Questions? Ideas? Want to collaborate?<br />We always love to hear from you!',
     }
@@ -964,6 +969,29 @@
 
   function toggleLang() {
     setLang(currentLang === 'he' ? 'en' : 'he');
+  }
+
+  // Scroll to top on load/refresh
+  if (history.scrollRestoration) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+
+  // Trailer: mobile = open in new tab, desktop = embed iframe
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
+  const trailerIframe = document.getElementById('trailer-iframe');
+  const trailerMobileBtn = document.getElementById('trailer-mobile-btn');
+  if (isMobile) {
+    trailerMobileBtn.style.display = 'flex';
+  } else {
+    trailerIframe.style.display = 'block';
+    trailerIframe.src = 'trailer.html';
+    trailerIframe.addEventListener('load', () => {
+      try {
+        const doc = trailerIframe.contentDocument || trailerIframe.contentWindow.document;
+        const style = doc.createElement('style');
+        style.textContent = '[class*="scrub"],[class*="timeline"],[class*="controls"],[class*="playback"],[class*="progress"],[class*="toolbar"],[class*="bar"]{display:none!important}';
+        doc.head.appendChild(style);
+      } catch(e) {}
+    });
   }
 
   // Smooth nav highlight
