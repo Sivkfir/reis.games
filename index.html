@@ -93,11 +93,19 @@
       cursor: pointer;
       transition: all .25s;
       letter-spacing: 1px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .lang-btn:hover {
       background: rgba(0,212,255,.1);
       border-color: var(--cyan);
       box-shadow: var(--glow-c);
+    }
+    .lang-btn .lang-text { display: inline; }
+
+    @media (max-width: 600px) {
+      .lang-btn { padding: 6px 10px; font-size: 16px; border-radius: 50%; }
+      .lang-btn .lang-text { display: none; }
     }
 
     /* ── HERO ── */
@@ -630,7 +638,7 @@
     <li><a href="#trailer" data-i18n="nav_trailer">טריילר</a></li>
     <li><a href="#contact" data-i18n="nav_contact">צור קשר</a></li>
   </ul>
-  <button class="lang-btn" onclick="toggleLang()">🌐 EN</button>
+  <button class="lang-btn" id="lang-btn" onclick="toggleLang()"><span class="lang-text">EN </span>🌐</button>
 </nav>
 
 <!-- ── HERO ── -->
@@ -891,7 +899,8 @@
       const key = el.dataset.i18n;
       if (t[key] !== undefined) el.innerHTML = t[key];
     });
-    document.querySelector('.lang-btn').textContent = lang === 'he' ? '🌐 EN' : '🌐 עב';
+    const btn = document.getElementById('lang-btn');
+    btn.innerHTML = lang === 'he' ? '<span class="lang-text">EN </span>🌐' : '<span class="lang-text">עב </span>🌐';
   }
 
   function toggleLang() {
