@@ -837,11 +837,13 @@
   <div class="video-wrapper" id="trailer-wrapper">
     <!-- Mobile: show play button; Desktop: load iframe -->
     <div id="trailer-mobile-btn" style="display:none;flex-direction:column;align-items:center;gap:20px;">
-      <div class="play-icon" onclick="window.open('trailer.html','_blank')" style="width:100px;height:100px;font-size:40px;">▶</div>
-      <p style="color:#aab;font-size:16px;" data-i18n="trailer_tap">לחץ לצפייה בטריילר</p>
+      <div class="play-icon" style="width:100px;height:100px;font-size:40px;pointer-events:none;">▶</div>
+      <p style="color:#aab;font-size:16px;" data-i18n="trailer_tap">הטריילר זמין בדסקטופ</p>
     </div>
     <iframe id="trailer-iframe" src="" frameborder="0" allowfullscreen
-      style="width:100%;height:100%;border:none;border-radius:18px;display:none;"></iframe>
+      style="width:100%;height:calc(100% + 56px);border:none;position:absolute;top:0;left:0;right:0;"></iframe>
+    <!-- Overlay to hide the progress bar at bottom -->
+    <div style="position:absolute;bottom:0;left:0;right:0;height:56px;background:linear-gradient(to bottom,transparent 0%,#05060f 60%);pointer-events:none;border-radius:0 0 16px 16px;"></div>
   </div>
 </section>
 
@@ -925,7 +927,7 @@
       about_p2: 'כל משחק שאנחנו בונים מגיע מדמיון, יצירתיות ואהבה אמיתית לגיימינג. מ-Brawl Stars ועד אפקטים מיוחדים — אנחנו לא מפסיקים לחלום ולבנות.',
       about_p3: 'הסטודיו של רעי הוא מקום שבו כל רעיון הופך למציאות — פיקסל אחד בכל פעם.',
       feat1: 'משחקים מקוריים', feat2: 'עדכונים מהירים', feat3: 'צוות מנצח', feat4: 'חוויה מדהימה',
-      trailer_title: 'טריילר <span>רשמי</span>', trailer_sub: 'קצת טעימה ממה שמחכה לך', trailer_soon: 'הטריילר בקרוב...', trailer_tap: 'לחץ לצפייה בטריילר',
+      trailer_title: 'טריילר <span>רשמי</span>', trailer_sub: 'קצת טעימה ממה שמחכה לך', trailer_soon: 'הטריילר בקרוב...', trailer_tap: 'הטריילר זמין בדסקטופ',
       contact_title: 'בואו <span>נדבר</span>',
       contact_p: 'שאלות? רעיונות? רוצים לשתף פעולה?<br />אנחנו תמיד שמחים לשמוע!',
     },
@@ -946,7 +948,7 @@
       about_p2: 'Every game we build comes from imagination, creativity and a real love for gaming. We never stop dreaming and building.',
       about_p3: "Rei's studio is a place where every idea becomes reality — one pixel at a time.",
       feat1: 'Original Games', feat2: 'Fast Updates', feat3: 'Winning Team', feat4: 'Amazing Experience',
-      trailer_title: 'Official <span>Trailer</span>', trailer_sub: 'A little taste of what awaits you', trailer_soon: 'Trailer coming soon...', trailer_tap: 'Tap to watch the trailer',
+      trailer_title: 'Official <span>Trailer</span>', trailer_sub: 'A little taste of what awaits you', trailer_soon: 'Trailer coming soon...', trailer_tap: 'Trailer available on desktop',
       contact_title: "Let's <span>Talk</span>",
       contact_p: 'Questions? Ideas? Want to collaborate?<br />We always love to hear from you!',
     }
