@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zombie Slayer — REI GAMES STUDIO</title>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0DXQGP2520"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0DXQGP2520');
+</script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#000; display:flex; justify-content:center; align-items:center; height:100vh; overflow:hidden; touch-action:none; }
@@ -589,11 +597,11 @@ function updateZombies(){
     const spd=(d<120&&!z.isBoss)?z.speed*1.4:z.speed;
     if(d>0){z.x=wrap(z.x+(dx/d)*spd,WORLD);z.y=wrap(z.y+(dy/d)*spd,WORLD);z.angle=Math.atan2(dy,dx);}
     if(z.flash>0)z.flash--;
-    if(d<18+z.r&&player.invincible===0){player.hp--;player.invincible=60;spawnP(player.x,player.y,'#ff0000',14,3);if(player.hp<=0)gameState='dead';}
+    if(d<18+z.r&&player.invincible===0){player.hp--;player.invincible=60;spawnP(player.x,player.y,'#ff0000',14,3);if(player.hp<=0){gameState='dead';gtag('event','game_over',{event_category:'zombie_slayer',value:player.kills});}}
   }
   for(let i=zombies.length-1;i>=0;i--){if(zombies[i].dead)zombies.splice(i,1);}
   if(!bossSpawned&&wSpawned>=wTotal&&zombies.length===0){wave++;spawnWave(wave);}
-  if(bossKilled)gameState='win';
+  if(bossKilled){gameState='win';gtag('event','game_win',{event_category:'zombie_slayer',value:player.kills});}
 }
 
 function drawZombie(z,camX,camY){
@@ -845,7 +853,14 @@ function drawTitle(){
   ctx.fillStyle='#607060';ctx.font='13px monospace';
   ctx.fillText('WASD – Move    Mouse – Aim    Click – Swing Sword',W/2,358);
   ctx.fillText('Find chests: 💎 Diamond  🛡 Iron Armor  ⚡ Rei Sword',W/2,382);
-  if(Math.floor(Date.now()/600)%2===0){ctx.fillStyle='#ffd700';ctx.font='bold 20px monospace';ctx.shadowColor='#ffd700';ctx.shadowBlur=12;ctx.fillText('▶  PRESS ENTER TO START  ◀',W/2,444);ctx.shadowBlur=0;}
+  // Start button
+  const pulse2=0.85+Math.sin(Date.now()/300)*0.15;
+  ctx.shadowColor='#ffd700'; ctx.shadowBlur=20*pulse2;
+  ctx.fillStyle='#ffd700';
+  rr(ctx, W/2-140, 418, 280, 54, 14); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#000'; ctx.font='bold 22px monospace'; ctx.textAlign='center';
+  ctx.fillText('▶  התחל לשחק  ◀', W/2, 452);
   ctx.fillStyle='#334433';ctx.font='12px monospace';ctx.fillText('⚡ REI GAMES STUDIO ⚡',W/2,H-18);
   ctx.textAlign='left';
 }
@@ -879,6 +894,7 @@ function startGame(){
   zombies.length=0;particles.length=0;trail.length=0;
   wave=1;bossSpawned=false;bossKilled=false;lootMsg=null;lootTimer=0;
   initChests();spawnWave(1);gameState='play';
+  gtag('event','game_start',{event_category:'zombie_slayer'});
 }
 window.addEventListener('keydown',e=>{ if(e.key==='Enter'&&gameState!=='play') startGame(); });
 

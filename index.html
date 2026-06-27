@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -965,7 +965,7 @@
     }
   };
 
-  let currentLang = 'he';
+  let currentLang = 'en';
 
   function setLang(lang) {
     currentLang = lang;
@@ -983,6 +983,8 @@
   function toggleLang() {
     setLang(currentLang === 'he' ? 'en' : 'he');
   }
+
+  setLang('en');
 
   // Smooth nav highlight
   const sections = document.querySelectorAll('section[id]');
