@@ -233,14 +233,19 @@ function updatePlayer(){
 }
 
 function swordHits(){
-  const tx=player.x+Math.cos(player.swordAngle)*player.sword.range;
-  const ty=player.y+Math.sin(player.swordAngle)*player.sword.range;
   for(const z of zombies){
     if(z.dead||player.hits.has(z))continue;
-    if(Math.hypot(wrapD(tx,z.x,WORLD),wrapD(ty,z.y,WORLD))<22+z.r){
+    // check 5 points along the sword (20%→100% of range) so close zombies don't get skipped
+    let hit=false;
+    for(let f=0.2;f<=1.0;f+=0.2){
+      const tx=player.x+Math.cos(player.swordAngle)*player.sword.range*f;
+      const ty=player.y+Math.sin(player.swordAngle)*player.sword.range*f;
+      if(Math.hypot(wrapD(tx,z.x,WORLD),wrapD(ty,z.y,WORLD))<20+z.r){hit=true;break;}
+    }
+    if(hit){
       z.hp-=player.sword.dmg; player.hits.add(z); z.flash=8;
       if(player.sword.rainbow) rainbowP(z.x,z.y,10); else spawnP(z.x,z.y,'#00ff88',6);
-      if(z.hp<=0){z.dead=true;player.kills++;spawnP(z.x,z.y,'#cc3300',18,4);if(z.isBoss)bossKilled=true;}
+      if(z.hp<=0){z.dead=true;player.kills++;spawnP(z.x,z.y,'#cc3300',18,4);if(z.isBoss){bossKilled=true;gtag('event','game_win',{event_category:'zombie_slayer',value:player.kills});}}
     }
   }
 }
@@ -425,8 +430,8 @@ function drawSword(sx,sy){
 
 // ─── TREASURE CHESTS ─────────────────────────────────────
 const LOOT=[
-  {name:'Diamond',color:'#00eeff',icon:'💎',effect:'diamond',desc:'+1 Max HP'},
-  {name:'Iron Armor',color:'#aaaaaa',icon:'🛡️',effect:'armor',desc:'+1 Max HP'},
+  {name:'Golden Shield',color:'#ffd700',icon:'🛡️',effect:'armor',desc:'+2 Max HP & full heal!'},
+  {name:'Health Crystal',color:'#00eeff',icon:'💎',effect:'diamond',desc:'+1 Max HP'},
   {name:'⚡ Rei Sword',color:'rainbow',icon:'⚔️',effect:'reiSword',desc:'Most powerful sword!'},
 ];
 const chests=[];
@@ -434,12 +439,13 @@ let lootMsg=null,lootTimer=0;
 
 function initChests(){
   chests.length=0;
+  // 3 chests only — rare loot
   const positions=[
-    {x:WORLD*0.2,y:WORLD*0.2},{x:WORLD*0.8,y:WORLD*0.2},
-    {x:WORLD*0.2,y:WORLD*0.8},{x:WORLD*0.8,y:WORLD*0.8},
-    {x:WORLD*0.5,y:WORLD*0.3},{x:WORLD*0.5,y:WORLD*0.7},
+    {x:WORLD*0.2,y:WORLD*0.2},
+    {x:WORLD*0.8,y:WORLD*0.8},
+    {x:WORLD*0.5,y:WORLD*0.15},
   ];
-  const pool=[LOOT[0],LOOT[1],LOOT[2],LOOT[0],LOOT[1],LOOT[0]];
+  const pool=[LOOT[1],LOOT[2],LOOT[0]]; // crystal, rei sword, golden shield
   positions.forEach((pos,i)=>chests.push({x:pos.x,y:pos.y,open:false,anim:0,loot:pool[i]}));
 }
 
@@ -448,7 +454,7 @@ function updateNearChest(){
   nearChest=null;
   for(const c of chests){
     if(c.open)continue;
-    if(Math.hypot(wrapD(player.x,c.x,WORLD),wrapD(player.y,c.y,WORLD))<50){
+    if(Math.hypot(wrapD(player.x,c.x,WORLD),wrapD(player.y,c.y,WORLD))<90){
       nearChest=c; break;
     }
   }
@@ -457,7 +463,8 @@ function openNearChest(){
   if(!nearChest||nearChest.open)return;
   nearChest.open=true;
   if(nearChest.loot.effect==='reiSword') player.sword=SWORD_REI;
-  else{player.maxHp=Math.min(player.maxHp+1,8);player.hp=Math.min(player.hp+1,player.maxHp);}
+  else if(nearChest.loot.effect==='armor'){player.maxHp=Math.min(player.maxHp+2,10);player.hp=Math.min(player.hp+2,player.maxHp);}
+  else{player.maxHp=Math.min(player.maxHp+1,10);player.hp=Math.min(player.hp+1,player.maxHp);}
   rainbowP(nearChest.x,nearChest.y,30); lootMsg=nearChest.loot; lootTimer=200;
 }
 window.addEventListener('keydown',e=>{ if(e.key===' '&&gameState==='play') openNearChest(); });
