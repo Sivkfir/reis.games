@@ -564,9 +564,9 @@ function drawChests(camX,camY){
           ctx.fillStyle=flash?'#ffd700':'#fff';
           ctx.shadowColor='#ffd700'; ctx.shadowBlur=14;
           ctx.font='bold 14px monospace'; ctx.textAlign='center';
-          ctx.fillText('[ SPACE ] לפתיחה',0,-50);
-          ctx.font='13px monospace'; ctx.fillStyle='#ffeeaa';
-          ctx.fillText('📦 תיבת אוצר',0,-68);
+          ctx.fillText('📦 OPEN CHEST',0,-50);
+          ctx.font='12px monospace'; ctx.fillStyle='#ffeeaa';
+          ctx.fillText('SPACE / tap 📦',0,-68);
           ctx.shadowBlur=0;
           // arrow pointing down to chest
           ctx.fillStyle='#ffd700';
@@ -858,8 +858,9 @@ function drawTitle(){
   ctx.shadowBlur=0;
   ctx.fillStyle='#88bb66';ctx.font='15px monospace';ctx.fillText('Survive the forest. Find treasure. Defeat the Boss.',W/2,294);
   ctx.fillStyle='#607060';ctx.font='13px monospace';
-  ctx.fillText('WASD – Move    Mouse – Aim    Click – Swing Sword',W/2,358);
-  ctx.fillText('Find chests: 💎 Diamond  🛡 Iron Armor  ⚡ Rei Sword',W/2,382);
+  ctx.fillText('WASD / Joystick – Move    Mouse / Tap – Aim & Swing ⚔️',W/2,358);
+  ctx.fillText('Walk near a chest → Press SPACE or tap 📦 to open',W/2,378);
+  ctx.fillText('Find 3 chests: 💎 +HP   🛡️ Golden Shield   ⚡ Rei Sword',W/2,398);
   // Start button
   const pulse2=0.85+Math.sin(Date.now()/300)*0.15;
   ctx.shadowColor='#ffd700'; ctx.shadowBlur=20*pulse2;
