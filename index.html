@@ -702,7 +702,7 @@
     <li><a href="#trailer" data-i18n="nav_trailer" onclick="closeMenu()">טריילר</a></li>
     <li><a href="#contact" data-i18n="nav_contact" onclick="closeMenu()">צור קשר</a></li>
   </ul>
-  <button class="lang-btn" id="lang-btn" onclick="toggleLang()"><span class="lang-text">EN </span>🌐</button>
+  <button class="lang-btn" id="lang-btn" onclick="gtag('event','click',{event_category:'ui',event_label:'lang_toggle'});toggleLang()"><span class="lang-text">EN </span>🌐</button>
   <div class="hamburger" id="hamburger" onclick="toggleMenu()">
     <span></span><span></span><span></span>
   </div>
@@ -729,8 +729,8 @@
     </p>
 
     <div class="hero-btns">
-      <a href="#games" class="btn btn-primary" data-i18n="hero_btn_play">🎮 שחק עכשיו</a>
-      <a href="#about" class="btn btn-secondary" data-i18n="hero_btn_about">👾 הסיפור שלנו</a>
+      <a href="#games" class="btn btn-primary" data-i18n="hero_btn_play" onclick="gtag('event','click',{event_category:'hero',event_label:'play_now'})">🎮 שחק עכשיו</a>
+      <a href="#about" class="btn btn-secondary" data-i18n="hero_btn_about" onclick="gtag('event','click',{event_category:'hero',event_label:'our_story'})">👾 הסיפור שלנו</a>
     </div>
 
     <div class="hero-stats">
@@ -773,7 +773,7 @@
         <p data-i18n="game1_desc">שרוד את היער, מצא אוצרות והביס את הבוס! WASD לתנועה, לחיצה להחרבה.</p>
         <div class="game-footer">
           <span class="game-rating">⭐⭐⭐⭐⭐</span>
-          <button class="play-btn" data-i18n="play" onclick="window.location='zombie-slayer/index.html'">שחק ▶</button>
+          <button class="play-btn" data-i18n="play" onclick="gtag('event','click',{event_category:'game',event_label:'zombie_slayer_play'});window.location='zombie-slayer/index.html'">שחק ▶</button>
         </div>
       </div>
     </div>
@@ -872,10 +872,10 @@
     </p>
     <span class="contact-email">hello@reis.games</span>
     <div class="social-row">
-      <a href="#" class="social-btn" title="YouTube">📺</a>
-      <a href="#" class="social-btn" title="TikTok">🎵</a>
-      <a href="#" class="social-btn" title="Instagram">📸</a>
-      <a href="#" class="social-btn" title="Discord">💬</a>
+      <a href="#" class="social-btn" title="YouTube" onclick="gtag('event','click',{event_category:'social',event_label:'youtube'})">📺</a>
+      <a href="#" class="social-btn" title="TikTok" onclick="gtag('event','click',{event_category:'social',event_label:'tiktok'})">🎵</a>
+      <a href="#" class="social-btn" title="Instagram" onclick="gtag('event','click',{event_category:'social',event_label:'instagram'})">📸</a>
+      <a href="#" class="social-btn" title="Discord" onclick="gtag('event','click',{event_category:'social',event_label:'discord'})">💬</a>
     </div>
   </div>
 </section>
