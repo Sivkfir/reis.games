@@ -557,22 +557,22 @@ function updateNearChest(){
   for(const c of chests){
     if(c.open) continue;
     const dist=Math.hypot(wrapD(player.x,c.x,WORLD), wrapD(player.y,c.y,WORLD));
-    if(dist<160){
-      nearChest=c;
-      if(!c.open){
-        c.open=true;
-        if(c.loot.effect==='reiSword') player.sword=SWORD_REI;
-        else if(c.loot.effect==='armor'){player.maxHp=Math.min(player.maxHp+2,10);player.hp=player.maxHp;}
-        else{player.maxHp=Math.min(player.maxHp+1,10);player.hp=Math.min(player.hp+1,player.maxHp);}
-        rainbowP(c.x,c.y,60);
-        spawnP(c.x,c.y,'#ffd700',30,6);
-        lootMsg=c.loot; lootTimer=360;
-        triggerShake(6,4);
-        console.log('CHEST OPENED:', c.loot.name);
-      }
-      break;
-    }
+    if(dist<160){ nearChest=c; break; }
   }
+}
+
+function openNearChest(){
+  if(!nearChest||nearChest.open) return;
+  const c=nearChest;
+  c.open=true;
+  if(c.loot.effect==='reiSword') player.sword=SWORD_REI;
+  else if(c.loot.effect==='armor'){player.maxHp=Math.min(player.maxHp+2,10);player.hp=player.maxHp;}
+  else{player.maxHp=Math.min(player.maxHp+1,10);player.hp=Math.min(player.hp+1,player.maxHp);}
+  rainbowP(c.x,c.y,60);
+  spawnP(c.x,c.y,'#ffd700',30,6);
+  lootMsg=c.loot; lootTimer=360;
+  triggerShake(6,4);
+  console.log('CHEST OPENED:', c.loot.name);
 }
 
 function drawChests(camX,camY){
@@ -1095,7 +1095,10 @@ function startGame(){
   initChests();spawnWave(1);gameState='play';
   gtag('event','game_start',{event_category:'zombie_slayer'});
 }
-window.addEventListener('keydown',e=>{ if(e.key==='Enter'&&gameState!=='play') startGame(); });
+window.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&gameState!=='play') startGame();
+  if((e.key===' '||e.key==='e'||e.key==='E')&&gameState==='play'){ e.preventDefault(); openNearChest(); }
+});
 
 // ─── MAIN LOOP ───────────────────────────────────────────
 function loop(){
