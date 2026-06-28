@@ -197,6 +197,93 @@ function rainbowP(wx,wy,n=20){ for(let i=0;i<n;i++){const a=rand(0,Math.PI*2),sp
 function updateP(){ for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.wx+=p.vx;p.wy+=p.vy;p.vx*=0.95;p.vy*=0.95;p.life-=0.03;if(p.life<=0)particles.splice(i,1);} }
 function drawP(camX,camY){ for(const p of particles){const sx=((p.wx-camX+W/2)%W+W)%W,sy=((p.wy-camY+H/2)%H+H)%H;ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=5;ctx.beginPath();ctx.arc(sx,sy,p.size,0,Math.PI*2);ctx.fill();} ctx.globalAlpha=1;ctx.shadowBlur=0; }
 
+// ─── FLOATING DAMAGE NUMBERS ─────────────────────────────
+const dmgNums=[];
+function spawnDmg(wx,wy,val,color='#ffff44'){
+  dmgNums.push({wx,wy,vy:-2.5,val,life:1,color});
+}
+function updateDmgNums(camX,camY){
+  for(let i=dmgNums.length-1;i>=0;i--){
+    const d=dmgNums[i];
+    d.wy+=d.vy; d.vy*=0.92; d.life-=0.022;
+    if(d.life<=0){dmgNums.splice(i,1);continue;}
+    const sx=((d.wx-camX+W/2)%W+W)%W, sy=((d.wy-camY+H/2)%H+H)%H;
+    ctx.globalAlpha=d.life;
+    ctx.font=`bold ${16+Math.round((1-d.life)*8)}px monospace`;
+    ctx.textAlign='center';
+    ctx.fillStyle=d.color; ctx.shadowColor=d.color; ctx.shadowBlur=10;
+    ctx.fillText('+'+d.val, sx, sy);
+  }
+  ctx.globalAlpha=1; ctx.shadowBlur=0; ctx.textAlign='left';
+}
+
+// ─── SCREEN SHAKE ────────────────────────────────────────
+let shakeFrames=0, shakeAmt=0;
+function triggerShake(frames=8,amt=6){shakeFrames=frames;shakeAmt=amt;}
+function getShakeOffset(){
+  if(shakeFrames<=0) return {ox:0,oy:0};
+  shakeFrames--;
+  return {ox:(Math.random()-0.5)*shakeAmt*2, oy:(Math.random()-0.5)*shakeAmt*2};
+}
+
+// ─── COMBO SYSTEM ────────────────────────────────────────
+let combo=0, comboTimer=0, comboDisplay=0, comboDisplayTimer=0;
+const COMBO_WINDOW=120; // frames to chain kills
+function addKillCombo(){
+  combo++;
+  comboTimer=COMBO_WINDOW;
+  if(combo>=3){comboDisplay=combo;comboDisplayTimer=90;}
+}
+function updateCombo(){
+  if(comboTimer>0){comboTimer--;} else {combo=0;}
+  if(comboDisplayTimer>0) comboDisplayTimer--;
+}
+function getComboMult(){ return combo>=5?3:combo>=3?2:1; }
+
+// ─── DROPS ───────────────────────────────────────────────
+const drops=[];
+function spawnDrop(wx,wy){
+  const r=Math.random();
+  if(r<0.18) drops.push({wx,wy,type:'hp',life:300,anim:0});
+  else if(r<0.26) drops.push({wx,wy,type:'speed',life:240,anim:0});
+}
+function updateDrops(camX,camY){
+  for(let i=drops.length-1;i>=0;i--){
+    const d=drops[i]; d.life--; d.anim+=0.08;
+    if(d.life<=0){drops.splice(i,1);continue;}
+    const dist=Math.hypot(wrapD(player.x,d.wx,WORLD),wrapD(player.y,d.wy,WORLD));
+    if(dist<30){
+      if(d.type==='hp'&&player.hp<player.maxHp){player.hp++;spawnP(player.x,player.y,'#ff4488',12,3);}
+      else if(d.type==='speed'){player.speedBoost=180;}
+      drops.splice(i,1); continue;
+    }
+    // draw
+    const sx=((d.wx-camX+W/2)%W+W)%W, sy=((d.wy-camY+H/2)%H+H)%H;
+    const bob=Math.sin(d.anim)*4;
+    ctx.globalAlpha=Math.min(1,d.life/30);
+    ctx.font='20px serif'; ctx.textAlign='center';
+    ctx.shadowColor=d.type==='hp'?'#ff4488':'#00ffcc'; ctx.shadowBlur=12;
+    ctx.fillText(d.type==='hp'?'❤️':'⚡',sx,sy-bob);
+    ctx.globalAlpha=1; ctx.shadowBlur=0; ctx.textAlign='left';
+  }
+}
+
+// ─── WAVE ANNOUNCEMENT ───────────────────────────────────
+let waveAnnounce=0;
+function drawWaveAnnounce(){
+  if(waveAnnounce<=0) return;
+  waveAnnounce--;
+  const a=Math.min(1,waveAnnounce/20)*Math.min(1,(120-waveAnnounce)/20);
+  ctx.globalAlpha=a;
+  ctx.textAlign='center';
+  ctx.font='bold 52px monospace';
+  ctx.fillStyle='#ff4422'; ctx.shadowColor='#ff4422'; ctx.shadowBlur=30;
+  ctx.fillText(`⚠ WAVE ${wave}`,W/2,H/2-20);
+  ctx.font='20px monospace'; ctx.fillStyle='#ffcc44'; ctx.shadowBlur=10;
+  ctx.fillText(`${wTotal} zombies incoming!`,W/2,H/2+20);
+  ctx.globalAlpha=1; ctx.shadowBlur=0; ctx.textAlign='left';
+}
+
 // ─── SWORD TRAIL ─────────────────────────────────────────
 const trail=[];
 
@@ -210,7 +297,7 @@ const player={
   angle:0,hp:5,maxHp:5,
   swordAngle:0,swinging:false,swingT:0,swingCD:0,
   hits:new Set(),invincible:0,kills:0,
-  sword:SWORD_WOOD,walkT:0
+  sword:SWORD_WOOD,walkT:0,speedBoost:0
 };
 
 function updatePlayer(){
@@ -220,8 +307,10 @@ function updatePlayer(){
   if(keys.has('a')||keys.has('arrowleft')) dx-=1;
   if(keys.has('d')||keys.has('arrowright'))dx+=1;
   if(dx||dy){const l=Math.hypot(dx,dy);dx/=l;dy/=l;player.walkT+=0.18;}
-  player.x=wrap(player.x+dx*player.speed,WORLD);
-  player.y=wrap(player.y+dy*player.speed,WORLD);
+  if(player.speedBoost>0){player.speedBoost--;}
+  const spd=player.speed*(player.speedBoost>0?1.7:1);
+  player.x=wrap(player.x+dx*spd,WORLD);
+  player.y=wrap(player.y+dy*spd,WORLD);
   player.angle=Math.atan2(mouse.y-H/2,mouse.x-W/2);
   if(player.swingCD>0)player.swingCD--;
   if(mouse.down&&player.swingCD===0&&!player.swinging){player.swinging=true;player.swingT=0;player.hits.clear();}
@@ -248,9 +337,17 @@ function swordHits(){
       if(Math.hypot(wrapD(tx,z.x,WORLD),wrapD(ty,z.y,WORLD))<20+z.r){hit=true;break;}
     }
     if(hit){
-      z.hp-=player.sword.dmg; player.hits.add(z); z.flash=8;
+      const dmg=player.sword.dmg*getComboMult();
+      z.hp-=dmg; player.hits.add(z); z.flash=8;
+      spawnDmg(z.x,z.y-z.r,dmg,player.sword.rainbow?`hsl(${Date.now()/5%360},100%,65%)`:'#ffff44');
       if(player.sword.rainbow) rainbowP(z.x,z.y,10); else spawnP(z.x,z.y,'#00ff88',6);
-      if(z.hp<=0){z.dead=true;player.kills++;spawnP(z.x,z.y,'#cc3300',18,4);if(z.isBoss){bossKilled=true;gtag('event','game_win',{event_category:'zombie_slayer',value:player.kills});}}
+      if(z.hp<=0){
+        z.dead=true;player.kills++;
+        addKillCombo();
+        spawnP(z.x,z.y,'#cc3300',18,4);
+        spawnDrop(z.x,z.y);
+        if(z.isBoss){bossKilled=true;gtag('event','game_win',{event_category:'zombie_slayer',value:player.kills});}
+      }
     }
   }
 }
@@ -459,7 +556,7 @@ function updateNearChest(){
   nearChest=null;
   for(const c of chests){
     if(c.open)continue;
-    if(Math.hypot(wrapD(player.x,c.x,WORLD),wrapD(player.y,c.y,WORLD))<90){
+    if(Math.hypot(wrapD(player.x,c.x,WORLD),wrapD(player.y,c.y,WORLD))<120){
       nearChest=c; break;
     }
   }
@@ -609,10 +706,10 @@ function updateZombies(){
     const spd=(d<120&&!z.isBoss)?z.speed*1.4:z.speed;
     if(d>0){z.x=wrap(z.x+(dx/d)*spd,WORLD);z.y=wrap(z.y+(dy/d)*spd,WORLD);z.angle=Math.atan2(dy,dx);}
     if(z.flash>0)z.flash--;
-    if(d<18+z.r&&player.invincible===0){player.hp--;player.invincible=60;spawnP(player.x,player.y,'#ff0000',14,3);if(player.hp<=0){gameState='dead';gtag('event','game_over',{event_category:'zombie_slayer',value:player.kills});}}
+    if(d<18+z.r&&player.invincible===0){player.hp--;player.invincible=60;triggerShake(10,8);spawnP(player.x,player.y,'#ff0000',14,3);combo=0;if(player.hp<=0){gameState='dead';gtag('event','game_over',{event_category:'zombie_slayer',value:player.kills});}}
   }
   for(let i=zombies.length-1;i>=0;i--){if(zombies[i].dead)zombies.splice(i,1);}
-  if(!bossSpawned&&wSpawned>=wTotal&&zombies.length===0){wave++;spawnWave(wave);}
+  if(!bossSpawned&&wSpawned>=wTotal&&zombies.length===0){wave++;spawnWave(wave);waveAnnounce=120;}
   if(bossKilled){gameState='win';gtag('event','game_win',{event_category:'zombie_slayer',value:player.kills});}
 }
 
@@ -802,6 +899,24 @@ function drawHUD(){
   const rem=(wTotal-wSpawned)+alive;
   ctx.fillStyle='rgba(0,0,0,0.4)';ctx.fillRect(W/2-72,H-32,144,24);
   ctx.fillStyle='#ff8844';ctx.font='13px monospace';ctx.textAlign='center';ctx.fillText(`🧟 ${rem} remaining`,W/2,H-16);ctx.textAlign='left';
+  // combo
+  if(comboDisplayTimer>0){
+    const a=Math.min(1,comboDisplayTimer/20);
+    ctx.globalAlpha=a;
+    ctx.textAlign='center';
+    const sz=28+Math.floor((1-comboDisplayTimer/90)*10);
+    ctx.font=`bold ${sz}px monospace`;
+    const h=(Date.now()/5)%360;
+    ctx.fillStyle=`hsl(${h},100%,65%)`; ctx.shadowColor=ctx.fillStyle; ctx.shadowBlur=20;
+    ctx.fillText(`${comboDisplay}x COMBO!`,W/2,H/2-80);
+    ctx.shadowBlur=0; ctx.globalAlpha=1; ctx.textAlign='left';
+  }
+  // speed boost indicator
+  if(player.speedBoost>0){
+    ctx.fillStyle='#00ffcc'; ctx.shadowColor='#00ffcc'; ctx.shadowBlur=8;
+    ctx.font='bold 13px monospace'; ctx.fillText('⚡ SPEED BOOST!',16,H-36);
+    ctx.shadowBlur=0;
+  }
   // loot popup
   if(lootTimer>0){
     lootTimer--;
@@ -903,9 +1018,10 @@ function drawWin(){
 let gameState='title';
 function startGame(){
   player.x=WORLD/2;player.y=WORLD/2;player.hp=5;player.maxHp=5;player.invincible=0;
-  player.kills=0;player.walkT=0;player.swinging=false;player.swingCD=0;player.sword=SWORD_WOOD;
-  zombies.length=0;particles.length=0;trail.length=0;
+  player.kills=0;player.walkT=0;player.swinging=false;player.swingCD=0;player.sword=SWORD_WOOD;player.speedBoost=0;
+  zombies.length=0;particles.length=0;trail.length=0;drops.length=0;dmgNums.length=0;
   wave=1;bossSpawned=false;bossKilled=false;lootMsg=null;lootTimer=0;
+  combo=0;comboTimer=0;comboDisplay=0;comboDisplayTimer=0;shakeFrames=0;waveAnnounce=90;
   initChests();spawnWave(1);gameState='play';
   gtag('event','game_start',{event_category:'zombie_slayer'});
 }
@@ -918,14 +1034,17 @@ function loop(){
   if(gameState==='title'){drawTitle();return;}
   if(gameState==='dead') {drawDead(); return;}
   if(gameState==='win')  {drawWin();  return;}
-  const camX=player.x,camY=player.y;
+  const {ox,oy}=getShakeOffset();
+  const camX=player.x+ox, camY=player.y+oy;
   drawForest(camX,camY);
   drawChests(camX,camY);
   drawP(camX,camY);
+  updateDrops(camX,camY);
   for(const z of zombies){if(!z.dead)drawZombie(z,camX,camY);}
   drawPlayer();
-  updatePlayer();updateZombies();updateP();
-  drawHUD();drawMinimap();
+  updateDmgNums(camX,camY);
+  updatePlayer();updateZombies();updateP();updateCombo();
+  drawHUD();drawMinimap();drawWaveAnnounce();
 }
 loop();
 
