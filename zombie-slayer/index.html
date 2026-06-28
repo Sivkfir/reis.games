@@ -306,7 +306,9 @@ function updatePlayer(){
   if(keys.has('s')||keys.has('arrowdown')) dy+=1;
   if(keys.has('a')||keys.has('arrowleft')) dx-=1;
   if(keys.has('d')||keys.has('arrowright'))dx+=1;
-  if(dx||dy){const l=Math.hypot(dx,dy);dx/=l;dy/=l;player.walkT+=0.18;}
+  // analog joystick overrides keys if active
+  if(joyDX!==0||joyDY!==0){ dx=joyDX; dy=joyDY; }
+  if(dx||dy){const l=Math.max(Math.hypot(dx,dy),0.001);dx/=l;dy/=l;player.walkT+=0.18;}
   if(player.speedBoost>0){player.speedBoost--;}
   const spd=player.speed*(player.speedBoost>0?1.7:1);
   player.x=wrap(player.x+dx*spd,WORLD);
@@ -557,7 +559,10 @@ function updateNearChest(){
   for(const c of chests){
     if(c.open)continue;
     if(Math.hypot(wrapD(player.x,c.x,WORLD),wrapD(player.y,c.y,WORLD))<120){
-      nearChest=c; break;
+      nearChest=c;
+      // AUTO-OPEN: no button needed, just walk in
+      openNearChest();
+      break;
     }
   }
 }
@@ -569,7 +574,6 @@ function openNearChest(){
   else{player.maxHp=Math.min(player.maxHp+1,10);player.hp=Math.min(player.hp+1,player.maxHp);}
   rainbowP(nearChest.x,nearChest.y,30); lootMsg=nearChest.loot; lootTimer=200;
 }
-window.addEventListener('keydown',e=>{ if(e.key===' '&&gameState==='play') openNearChest(); });
 
 function drawChests(camX,camY){
   for(const c of chests){
@@ -1104,6 +1108,7 @@ const jZone = document.getElementById('joystick-zone');
 const jKnob = document.getElementById('joystick-knob');
 const jR = 60; // zone radius
 let jActive = false, jId = null, jCX = 0, jCY = 0;
+let joyDX = 0, joyDY = 0; // analog joystick output (-1 to 1)
 
 jZone.addEventListener('touchstart', e => {
   e.preventDefault();
@@ -1121,26 +1126,22 @@ jZone.addEventListener('touchmove', e => {
     if (t.identifier !== jId) continue;
     const dx = t.clientX - jCX;
     const dy = t.clientY - jCY;
-    const dist = Math.min(Math.hypot(dx, dy), jR);
+    const dist = Math.hypot(dx, dy);
+    const clamped = Math.min(dist, jR);
     const angle = Math.atan2(dy, dx);
-    const kx = Math.cos(angle) * dist;
-    const ky = Math.sin(angle) * dist;
+    const kx = Math.cos(angle) * clamped;
+    const ky = Math.sin(angle) * clamped;
     jKnob.style.transform = `translate(calc(-50% + ${kx}px), calc(-50% + ${ky}px))`;
-
-    // Map to keys
-    const threshold = 18;
-    keys.delete('w'); keys.delete('s'); keys.delete('a'); keys.delete('d');
-    if (ky < -threshold) keys.add('w');
-    if (ky >  threshold) keys.add('s');
-    if (kx < -threshold) keys.add('a');
-    if (kx >  threshold) keys.add('d');
+    // Analog: normalize to -1..1
+    joyDX = kx / jR;
+    joyDY = ky / jR;
   }
 }, { passive: false });
 
 function jRelease() {
   jActive = false; jId = null;
   jKnob.style.transform = 'translate(-50%,-50%)';
-  keys.delete('w'); keys.delete('s'); keys.delete('a'); keys.delete('d');
+  joyDX = 0; joyDY = 0;
 }
 jZone.addEventListener('touchend',    e => { e.preventDefault(); jRelease(); }, { passive: false });
 jZone.addEventListener('touchcancel', e => { e.preventDefault(); jRelease(); }, { passive: false });
