@@ -4,13 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zombie Slayer — REI GAMES STUDIO</title>
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-0DXQGP2520"></script>
+<!-- Google Analytics (consent-gated) -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-0DXQGP2520');
+  if (localStorage.getItem('cookie_consent') === 'accepted') {
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-0DXQGP2520';
+    document.head.appendChild(s);
+    gtag('js', new Date());
+    gtag('config', 'G-0DXQGP2520');
+  }
 </script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
