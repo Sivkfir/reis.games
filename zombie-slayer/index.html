@@ -48,9 +48,19 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#060409; margin:0; padding:0; }
-#game-container { position:relative; width:100%; height:100vh; overflow:hidden; touch-action:none; background:#000; }
-#wrapper { position:relative; }
-canvas { display:block; cursor:crosshair; }
+#game-container {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 44px); /* 44px = topbar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+  background: #000;
+}
+#wrapper { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+canvas { display: block; cursor: crosshair; max-width: 100%; max-height: 100%; width: auto; height: auto; }
 
 /* ── VIRTUAL JOYSTICK ── */
 #joystick-zone {
@@ -117,7 +127,7 @@ canvas { display:block; cursor:crosshair; }
 
 /* Game portal wrapper */
 .game-page-outer { background: #060409; font-family: 'Orbitron', monospace; color: #ccc; }
-.game-topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; background:rgba(0,0,0,0.6); border-bottom:1px solid rgba(0,212,255,0.12); }
+.game-topbar { display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:44px; background:rgba(0,0,0,0.6); border-bottom:1px solid rgba(0,212,255,0.12); flex-shrink:0; }
 .game-topbar a { color:#00d4ff; text-decoration:none; font-size:11px; opacity:0.8; }
 .game-topbar a:hover { opacity:1; }
 .game-topbar-title { font-size:12px; color:#888; }
@@ -154,19 +164,6 @@ canvas { display:block; cursor:crosshair; }
   <span class="game-topbar-title">Zombie Slayer</span>
   <a href="https://reis.games/" aria-label="Home" style="opacity:0;pointer-events:none;" tabindex="-1"></a>
 </div>
-<!-- Ad placeholder: Leaderboard above game -->
-<div class="ad-placeholder ad-leaderboard" aria-hidden="true">[ Ad Space — 728×50 ]</div>
-<!-- Game info header -->
-<div class="game-info-section">
-  <h1>Zombie Slayer</h1>
-  <p class="game-tagline">Survive the dark forest · Loot chests · Slay the Boss</p>
-  <div class="game-meta-tags">
-    <span class="game-tag">Action</span>
-    <span class="game-tag">Survival</span>
-    <span class="game-tag">Horror</span>
-    <span class="game-tag game-difficulty">Medium</span>
-  </div>
-</div>
 <div id="game-container">
 <div id="wrapper">
   <canvas id="c"></canvas>
@@ -202,7 +199,7 @@ const keys = new Set();
 const mouse = { x:W/2, y:H/2, down:false };
 window.addEventListener('keydown', e=>{ keys.add(e.key.toLowerCase()); e.preventDefault(); });
 window.addEventListener('keyup',   e=>{ keys.delete(e.key.toLowerCase()); });
-canvas.addEventListener('mousemove', e=>{ const r=canvas.getBoundingClientRect(); mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top; });
+canvas.addEventListener('mousemove', e=>{ const r=canvas.getBoundingClientRect(); mouse.x=(e.clientX-r.left)*(W/r.width); mouse.y=(e.clientY-r.top)*(H/r.height); });
 canvas.addEventListener('mousedown', ()=>{ mouse.down=true; });
 canvas.addEventListener('mouseup',   ()=>{ mouse.down=false; });
 canvas.tabIndex=0; canvas.addEventListener('click',()=>canvas.focus()); canvas.focus();
