@@ -4,28 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>REI Games Studio – Imagine · Build · Play</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet" />
-  <!-- Analytics loaded only after cookie consent -->
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    function loadAnalytics() {
-      // Google Analytics
-      const ga = document.createElement('script');
-      ga.async = true;
-      ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-0DXQGP2520';
-      document.head.appendChild(ga);
-      gtag('js', new Date());
-      gtag('config', 'G-0DXQGP2520');
-      // Microsoft Clarity
-      (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "xdfhcbeuy2");
-    }
-    if (localStorage.getItem('cookie_consent') === 'accepted') loadAnalytics();
+  <meta name="description" content="REI Games Studio – Free browser games created by Rei, age 7. Play Zombie Slayer and more. New games coming soon!">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://reis.games/">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://reis.games/">
+  <meta property="og:title" content="REI Games Studio – Imagine · Build · Play">
+  <meta property="og:description" content="Free browser games created by Rei, age 7. Play Zombie Slayer and more. New games coming soon!">
+  <meta property="og:image" content="https://reis.games/logo-white.png">
+  <meta property="og:site_name" content="REI Games Studio">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="REI Games Studio – Imagine · Build · Play">
+  <meta name="twitter:description" content="Free browser games created by Rei, age 7.">
+  <meta name="twitter:image" content="https://reis.games/logo-white.png">
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "REI Games Studio",
+    "url": "https://reis.games",
+    "logo": "https://reis.games/logo-white.png",
+    "description": "Free browser games for all ages",
+    "email": "hello@reis.games"
+  }
   </script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet" />
+  <script src="games.js"></script>
   <style>
     :root {
       --cyan:   #00d4ff;
@@ -655,6 +662,37 @@
     }
 
     /* ── RESPONSIVE ── */
+    /* ── COOKIE BANNER & MODAL ── */
+    #cookie-banner {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+      background: rgba(10,8,20,0.97); border-top: 1px solid rgba(0,212,255,0.2);
+      padding: 14px 20px; backdrop-filter: blur(12px);
+    }
+    #cookie-banner-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    #cookie-banner-text { flex: 1; font-size: 13px; color: #aab; margin: 0; }
+    #cookie-banner-text a { color: #00d4ff; }
+    #cookie-banner-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    #cb-reject { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    #cb-manage { background: transparent; border: 1px solid rgba(0,212,255,0.4); color: #00d4ff; padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    #cb-accept { background: #00d4ff; border: none; color: #000; padding: 8px 18px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    #cookie-modal { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; }
+    #cookie-modal-inner { background: #0d0b1a; border: 1px solid rgba(0,212,255,0.2); border-radius: 16px; padding: 28px; max-width: 480px; width: 90%; }
+    #cookie-modal-inner h2 { color: #fff; font-size: 18px; margin: 0 0 8px; }
+    #cookie-modal-inner > p { color: #aab; font-size: 13px; margin: 0 0 20px; }
+    .cookie-pref-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-top: 1px solid rgba(255,255,255,0.07); }
+    .cookie-pref-row div strong { color: #eee; font-size: 14px; }
+    .cookie-pref-row div p { color: #778; font-size: 12px; margin: 3px 0 0; }
+    .cookie-toggle { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .cookie-toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #333; border-radius: 24px; cursor: pointer; transition: 0.2s; }
+    .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.2s; }
+    .cookie-toggle input:checked + .toggle-slider { background: #00d4ff; }
+    .cookie-toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+    .cookie-toggle input:disabled + .toggle-slider { opacity: 0.5; cursor: not-allowed; }
+    #cookie-modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    #cookie-modal-buttons button:first-child { background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #888; padding: 9px 18px; border-radius: 8px; cursor: pointer; }
+    #cm-save { background: #00d4ff; border: none; color: #000; padding: 9px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
     @media (max-width: 900px) {
       section { padding: 80px 24px; }
 
@@ -893,21 +931,59 @@
   <p style="margin-top:12px;font-size:11px;">
     <a href="privacy.html" style="color:#556;text-decoration:none;" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#556'">Privacy Policy</a>
     &nbsp;·&nbsp;
-    <a href="privacy.html#cookies" style="color:#556;text-decoration:none;" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#556'">Cookie Policy</a>
+    <a href="cookie-policy.html" style="color:#556;text-decoration:none;" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#556'">Cookie Policy</a>
     &nbsp;·&nbsp;
-    <a href="#" onclick="openCookieSettings();return false;" style="color:#556;text-decoration:none;" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#556'">Cookie Settings</a>
+    <a onclick="openCookieSettings()" style="color:#556;text-decoration:none;cursor:pointer;" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#556'">Cookie Settings</a>
   </p>
 </footer>
 
-<!-- ── COOKIE CONSENT BANNER ── -->
-<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,30,0.97);border-top:1px solid rgba(0,212,255,0.3);padding:16px 24px;z-index:9999;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;backdrop-filter:blur(10px);">
-  <p style="margin:0;font-size:13px;color:#aab;max-width:700px;">
-    🍪 We use cookies and analytics (Google Analytics & Microsoft Clarity) to improve your experience.
-    <a href="privacy.html" style="color:#00d4ff;">Learn more</a>
-  </p>
-  <div style="display:flex;gap:10px;flex-shrink:0;">
-    <button onclick="declineCookies()" style="background:transparent;border:1px solid #445;color:#778;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:13px;">Decline</button>
-    <button onclick="acceptCookies()" style="background:linear-gradient(135deg,#00d4ff,#1a1aff);border:none;color:#fff;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;">Accept</button>
+<!-- COOKIE BANNER -->
+<div id="cookie-banner" style="display:none;" role="dialog" aria-label="Cookie preferences">
+  <div id="cookie-banner-inner">
+    <p id="cookie-banner-text">We use cookies to improve your experience. Analytics cookies help us understand how you use our site. <a href="cookie-policy.html">Learn more</a></p>
+    <div id="cookie-banner-buttons">
+      <button id="cb-reject" onclick="rejectNonEssential()">Reject Non-Essential</button>
+      <button id="cb-manage" onclick="openCookiePrefs()">Manage Preferences</button>
+      <button id="cb-accept" onclick="acceptAllCookies()">Accept All</button>
+    </div>
+  </div>
+</div>
+
+<!-- COOKIE PREFERENCES MODAL -->
+<div id="cookie-modal" style="display:none;" role="dialog" aria-modal="true" aria-label="Cookie preferences">
+  <div id="cookie-modal-inner">
+    <h2>Cookie Preferences</h2>
+    <p>Choose which cookies you allow. Essential cookies cannot be disabled as they are required for the site to function.</p>
+
+    <div class="cookie-pref-row">
+      <div>
+        <strong>Essential Cookies</strong>
+        <p>Required for the site to function. Cannot be disabled.</p>
+      </div>
+      <label class="cookie-toggle"><input type="checkbox" checked disabled><span class="toggle-slider"></span></label>
+    </div>
+
+    <div class="cookie-pref-row">
+      <div>
+        <strong>Analytics Cookies</strong>
+        <p>Help us understand usage patterns (Google Analytics, Microsoft Clarity).</p>
+      </div>
+      <label class="cookie-toggle"><input type="checkbox" id="pref-analytics"><span class="toggle-slider"></span></label>
+    </div>
+
+    <div class="cookie-pref-row">
+      <div>
+        <strong>Advertising Cookies</strong>
+        <p>Used to serve relevant ads (Google AdSense). Not currently active.</p>
+      </div>
+      <label class="cookie-toggle"><input type="checkbox" id="pref-advertising"><span class="toggle-slider"></span></label>
+    </div>
+
+    <div id="cookie-modal-buttons">
+      <button onclick="closeCookiePrefs()">Cancel</button>
+      <button id="cm-save" onclick="saveCookiePrefs()">Save Preferences</button>
+    </div>
+    <p style="margin-top:12px;font-size:11px;opacity:0.5;">For more information see our <a href="cookie-policy.html">Cookie Policy</a>.</p>
   </div>
 </div>
 
@@ -1010,29 +1086,89 @@
 
   setLang('en');
 
-  // ── COOKIE CONSENT ──
-  const banner = document.getElementById('cookie-banner');
+  // ─── CONSENT SYSTEM ───────────────────────────────────────
+  const ANALYTICS_GA_ID = 'G-0DXQGP2520';
+  const ANALYTICS_CLARITY_ID = 'xdfhcbeuy2';
 
-  function showBanner() { banner.style.display = 'flex'; }
-  function hideBanner() { banner.style.display = 'none'; }
-
-  function acceptCookies() {
-    localStorage.setItem('cookie_consent', 'accepted');
-    hideBanner();
-    loadAnalytics();
+  function getPrefs() {
+    try { return JSON.parse(localStorage.getItem('cookie_prefs') || '{}'); } catch(e) { return {}; }
   }
-  function declineCookies() {
-    localStorage.setItem('cookie_consent', 'declined');
-    hideBanner();
+  function setPrefs(prefs) {
+    localStorage.setItem('cookie_prefs', JSON.stringify(prefs));
+    localStorage.setItem('cookie_banner_dismissed', '1');
   }
-  function openCookieSettings() { showBanner(); }
 
-  window.acceptCookies = acceptCookies;
-  window.declineCookies = declineCookies;
-  window.openCookieSettings = openCookieSettings;
+  function loadAnalytics() {
+    // GA4
+    if (!window._gaLoaded) {
+      window._gaLoaded = true;
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function(){ dataLayer.push(arguments); };
+      const s = document.createElement('script');
+      s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ANALYTICS_GA_ID;
+      document.head.appendChild(s);
+      gtag('js', new Date()); gtag('config', ANALYTICS_GA_ID);
+    }
+    // Microsoft Clarity
+    if (!window._clarityLoaded) {
+      window._clarityLoaded = true;
+      (function(c,l,a,r,i,t,y){ c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src='https://www.clarity.ms/tag/'+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window,document,'clarity','script',ANALYTICS_CLARITY_ID);
+    }
+  }
 
-  // Show banner only if no decision made yet
-  if (!localStorage.getItem('cookie_consent')) showBanner();
+  function applyPrefs(prefs) {
+    if (prefs.analytics) loadAnalytics();
+  }
+
+  function acceptAllCookies() {
+    const prefs = { analytics: true, advertising: false };
+    setPrefs(prefs); applyPrefs(prefs);
+    document.getElementById('cookie-banner').style.display = 'none';
+  }
+  function rejectNonEssential() {
+    const prefs = { analytics: false, advertising: false };
+    setPrefs(prefs);
+    document.getElementById('cookie-banner').style.display = 'none';
+  }
+  function openCookiePrefs() {
+    const prefs = getPrefs();
+    const elA = document.getElementById('pref-analytics');
+    const elD = document.getElementById('pref-advertising');
+    if (elA) elA.checked = !!prefs.analytics;
+    if (elD) elD.checked = !!prefs.advertising;
+    document.getElementById('cookie-modal').style.display = 'flex';
+  }
+  function closeCookiePrefs() {
+    document.getElementById('cookie-modal').style.display = 'none';
+  }
+  function saveCookiePrefs() {
+    const prefs = {
+      analytics: document.getElementById('pref-analytics').checked,
+      advertising: document.getElementById('pref-advertising').checked,
+    };
+    setPrefs(prefs); applyPrefs(prefs);
+    document.getElementById('cookie-modal').style.display = 'none';
+    document.getElementById('cookie-banner').style.display = 'none';
+  }
+  function openCookieSettings() {
+    openCookiePrefs();
+  }
+
+  // Init on load
+  (function() {
+    const dismissed = localStorage.getItem('cookie_banner_dismissed');
+    const prefs = getPrefs();
+    if (dismissed) {
+      applyPrefs(prefs);
+    } else {
+      document.getElementById('cookie-banner').style.display = 'block';
+    }
+    const modal = document.getElementById('cookie-modal');
+    if (modal) modal.addEventListener('click', function(e){ if(e.target===modal) closeCookiePrefs(); });
+  })();
 
   // Smooth nav highlight
   const sections = document.querySelectorAll('section[id]');

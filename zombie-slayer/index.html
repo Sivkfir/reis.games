@@ -4,12 +4,39 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zombie Slayer — REI GAMES STUDIO</title>
+<meta name="description" content="Zombie Slayer – Survive waves of zombies in a dark forest. Loot treasure chests, find the Rei Sword and defeat the Boss. Free browser game by REI Games Studio.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://reis.games/zombie-slayer/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://reis.games/zombie-slayer/">
+<meta property="og:title" content="Zombie Slayer — REI Games Studio">
+<meta property="og:description" content="Survive waves of zombies in a dark forest. Loot chests, find the Rei Sword and defeat the Boss. Free browser game.">
+<meta property="og:image" content="https://reis.games/logo-white.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Zombie Slayer — REI Games Studio">
+<meta name="twitter:description" content="Survive waves of zombies in a dark forest. Free browser game by REI Games Studio.">
+<meta name="twitter:image" content="https://reis.games/logo-white.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Zombie Slayer",
+  "description": "A top-down action survival game where you fight zombie waves, loot chests and defeat the Boss.",
+  "url": "https://reis.games/zombie-slayer/",
+  "publisher": { "@type": "Organization", "name": "REI Games Studio", "url": "https://reis.games" },
+  "genre": ["Action", "Survival", "Horror"],
+  "playMode": "SinglePlayer",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web Browser"
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <!-- Google Analytics (consent-gated) -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  if (localStorage.getItem('cookie_consent') === 'accepted') {
+  const _prefs = (function(){ try{ return JSON.parse(localStorage.getItem('cookie_prefs')||'{}'); }catch(e){return{};} })();
+  if (_prefs.analytics) {
     const s = document.createElement('script');
     s.async = true;
     s.src = 'https://www.googletagmanager.com/gtag/js?id=G-0DXQGP2520';
@@ -20,7 +47,8 @@
 </script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#000; display:flex; justify-content:center; align-items:center; height:100vh; overflow:hidden; touch-action:none; }
+body { background:#060409; margin:0; padding:0; }
+#game-container { position:relative; width:100%; height:100vh; overflow:hidden; touch-action:none; background:#000; }
 #wrapper { position:relative; }
 canvas { display:block; cursor:crosshair; }
 
@@ -86,14 +114,66 @@ canvas { display:block; cursor:crosshair; }
 @media (pointer:coarse) {
   #joystick-zone, #attack-btn, #space-btn { display:flex; }
 }
+
+/* Game portal wrapper */
+.game-page-outer { background: #060409; font-family: 'Orbitron', monospace; color: #ccc; }
+.game-topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; background:rgba(0,0,0,0.6); border-bottom:1px solid rgba(0,212,255,0.12); }
+.game-topbar a { color:#00d4ff; text-decoration:none; font-size:11px; opacity:0.8; }
+.game-topbar a:hover { opacity:1; }
+.game-topbar-title { font-size:12px; color:#888; }
+.ad-placeholder { background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.08); border-radius:6px; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.12); font-size:10px; font-family:monospace; }
+.ad-leaderboard { width:100%; height:50px; max-width:728px; margin:8px auto; }
+.ad-rectangle { width:300px; height:90px; margin:0 auto; }
+.game-info-section { max-width:800px; margin:0 auto; padding:20px 20px 0; }
+.game-info-section h1 { font-size:20px; color:#fff; margin:0 0 6px; }
+.game-info-section .game-tagline { color:#888; font-size:12px; margin:0 0 16px; }
+.game-controls-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.game-controls-block { background:rgba(255,255,255,0.04); border-radius:8px; padding:12px 14px; }
+.game-controls-block h3 { font-size:10px; color:#00d4ff; margin:0 0 8px; opacity:0.8; }
+.game-controls-block ul { margin:0; padding-left:14px; color:#aaa; font-size:11px; line-height:1.8; }
+.game-meta-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+.game-tag { background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2); color:#00d4ff; border-radius:4px; padding:3px 8px; font-size:10px; }
+.game-difficulty { border-color:rgba(255,200,0,0.3); color:#ffd700; background:rgba(255,200,0,0.06); }
+.related-games-section { max-width:800px; margin:0 auto; padding:16px 20px 24px; }
+.related-games-section h2 { font-size:13px; color:#aaa; margin:0 0 12px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px; }
+.related-games-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; }
+.related-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:14px; text-decoration:none; color:#aaa; font-size:12px; transition:border-color 0.2s; }
+.related-card:hover { border-color:rgba(0,212,255,0.3); }
+.related-card .rc-title { color:#eee; font-size:13px; margin-bottom:4px; }
+.related-card .rc-status { font-size:10px; color:#555; }
+.game-footer-bar { text-align:center; padding:12px; font-size:10px; color:#444; border-top:1px solid rgba(255,255,255,0.04); }
+.game-footer-bar a { color:#555; margin:0 8px; text-decoration:none; }
+@media(max-width:500px){ .game-controls-grid{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
+<div class="game-page-outer">
+<!-- Top bar -->
+<div class="game-topbar">
+  <a href="https://reis.games/">← REI Games Studio</a>
+  <span class="game-topbar-title">Zombie Slayer</span>
+  <a href="https://reis.games/" aria-label="Home"></a>
+</div>
+<!-- Ad placeholder: Leaderboard above game -->
+<div class="ad-placeholder ad-leaderboard" aria-hidden="true">[ Ad Space — 728×50 ]</div>
+<!-- Game info header -->
+<div class="game-info-section">
+  <h1>Zombie Slayer</h1>
+  <p class="game-tagline">Survive the dark forest · Loot chests · Slay the Boss</p>
+  <div class="game-meta-tags">
+    <span class="game-tag">Action</span>
+    <span class="game-tag">Survival</span>
+    <span class="game-tag">Horror</span>
+    <span class="game-tag game-difficulty">Medium</span>
+  </div>
+</div>
+<div id="game-container">
 <div id="wrapper">
   <canvas id="c"></canvas>
   <div id="joystick-zone"><div id="joystick-knob"></div></div>
   <div id="attack-btn">⚔️</div>
   <div id="space-btn">📦</div>
+</div>
 </div>
 <script>
 // REI GAMES STUDIO — Zombie Slayer v0.4
@@ -1296,17 +1376,20 @@ loop();
 
 // ─── RESPONSIVE SCALING ──────────────────────────────────
 const wrapper = document.getElementById('wrapper');
+const gameContainer = document.getElementById('game-container');
 function resizeGame() {
-  const scaleX = window.innerWidth  / W;
-  const scaleY = window.innerHeight / H;
+  const cw = gameContainer.clientWidth;
+  const ch = gameContainer.clientHeight;
+  const scaleX = cw / W;
+  const scaleY = ch / H;
   const scale  = Math.min(scaleX, scaleY);
   wrapper.style.width  = W + 'px';
   wrapper.style.height = H + 'px';
   wrapper.style.transform = `scale(${scale})`;
   wrapper.style.transformOrigin = 'top left';
   wrapper.style.position = 'absolute';
-  wrapper.style.top  = ((window.innerHeight - H * scale) / 2) + 'px';
-  wrapper.style.left = ((window.innerWidth  - W * scale) / 2) + 'px';
+  wrapper.style.top  = ((ch - H * scale) / 2) + 'px';
+  wrapper.style.left = ((cw - W * scale) / 2) + 'px';
 }
 resizeGame();
 window.addEventListener('resize', resizeGame);
@@ -1407,5 +1490,64 @@ spaceBtn.addEventListener('touchstart', e => {
   if (gameState === 'play') openNearChest();
 }, { passive: false });
 </script>
+</div><!-- close game-page-outer -->
+<!-- Ad placeholder: Rectangle below game -->
+<div class="ad-placeholder ad-rectangle" style="margin:12px auto;" aria-hidden="true">[ Ad Space — 300×90 ]</div>
+
+<!-- Controls section -->
+<div class="game-info-section" style="padding-top:16px;">
+  <div class="game-controls-grid">
+    <div class="game-controls-block">
+      <h3>KEYBOARD & MOUSE</h3>
+      <ul>
+        <li>WASD — Move</li>
+        <li>Mouse — Aim</li>
+        <li>Click — Attack</li>
+        <li>SPACE / E — Open Chest</li>
+        <li>ENTER — Start / Restart</li>
+      </ul>
+    </div>
+    <div class="game-controls-block">
+      <h3>TOUCH (MOBILE)</h3>
+      <ul>
+        <li>Left joystick — Move</li>
+        <li>Tap right side — Aim & Attack</li>
+        <li>Chest button 📦 — Open Chest</li>
+      </ul>
+    </div>
+  </div>
+  <p style="font-size:11px;color:#555;margin:0;">
+    Survive all waves · Find 2 treasure chests · Defeat the Boss to win<br>
+    Drops: ❤️ Health · ⚡ Speed boost · 🛡️ Golden Shield · ⚔️ Rei Sword
+  </p>
+</div>
+
+<!-- Related games -->
+<div class="related-games-section">
+  <h2>MORE GAMES</h2>
+  <div class="related-games-grid">
+    <a href="https://reis.games/#games" class="related-card">
+      <div class="rc-title">Turbo Pixel</div>
+      <div class="rc-status">Coming Soon</div>
+    </a>
+    <a href="https://reis.games/#games" class="related-card">
+      <div class="rc-title">Dungeon REI</div>
+      <div class="rc-status">Coming Soon</div>
+    </a>
+    <a href="https://reis.games/#games" class="related-card">
+      <div class="rc-title">Space Pixel</div>
+      <div class="rc-status">Coming Soon</div>
+    </a>
+  </div>
+  <!-- Ad placeholder: between related games and footer -->
+  <div class="ad-placeholder ad-rectangle" style="margin:16px auto 0;" aria-hidden="true">[ Ad Space — 300×90 ]</div>
+</div>
+
+<!-- Page footer -->
+<div class="game-footer-bar">
+  <a href="https://reis.games/">REI Games Studio</a>
+  <a href="https://reis.games/privacy.html">Privacy Policy</a>
+  <a href="https://reis.games/cookie-policy.html">Cookie Policy</a>
+</div>
 </body>
 </html>
