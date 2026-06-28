@@ -152,7 +152,7 @@ canvas { display:block; cursor:crosshair; }
 <div class="game-topbar">
   <a href="https://reis.games/">← REI Games Studio</a>
   <span class="game-topbar-title">Zombie Slayer</span>
-  <a href="https://reis.games/" aria-label="Home"></a>
+  <a href="https://reis.games/" aria-label="Home" style="opacity:0;pointer-events:none;" tabindex="-1"></a>
 </div>
 <!-- Ad placeholder: Leaderboard above game -->
 <div class="ad-placeholder ad-leaderboard" aria-hidden="true">[ Ad Space — 728×50 ]</div>
@@ -1552,7 +1552,7 @@ spaceBtn.addEventListener('touchstart', e => {
 </div>
 
 <!-- ── COOKIE BANNER ── -->
-<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#111;color:#eee;padding:14px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;border-top:2px solid #333;font-family:sans-serif;font-size:13px;">
+<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#111;color:#eee;padding:14px 20px;flex-wrap:wrap;align-items:center;gap:10px;border-top:2px solid #333;font-family:sans-serif;font-size:13px;">
   <span style="flex:1;min-width:200px;">We use cookies for analytics and ads. <a href="https://reis.games/cookie-policy.html" style="color:#7ecfff;">Learn more</a></span>
   <button onclick="rejectNonEssential()" style="background:#333;color:#ccc;border:1px solid #555;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;">Reject Non-Essential</button>
   <button onclick="openCookiePrefs()" style="background:#444;color:#fff;border:1px solid #666;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;">Manage Preferences</button>
@@ -1560,7 +1560,7 @@ spaceBtn.addEventListener('touchstart', e => {
 </div>
 
 <!-- ── COOKIE MODAL ── -->
-<div id="cookie-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;">
+<div id="cookie-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;">
   <div style="background:#1a1a1a;color:#eee;border-radius:12px;padding:28px;max-width:420px;width:90%;font-family:sans-serif;font-size:13px;border:1px solid #333;">
     <h3 style="margin:0 0 14px;font-size:16px;">Cookie Preferences</h3>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #2a2a2a;">
