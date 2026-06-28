@@ -885,7 +885,38 @@
   <img src="logo-white.png" alt="REI Games Studio" />
   <p>© 2025 REI GAMES STUDIO · ALL RIGHTS RESERVED</p>
   <p style="font-size:11px;color:#334;">IMAGINE · BUILD · PLAY</p>
+  <p style="margin-top:12px;font-size:11px;">
+    <a href="privacy.html" style="color:#556;text-decoration:none;" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#556'">Privacy Policy</a>
+    &nbsp;·&nbsp;
+    <a href="privacy.html#cookies" style="color:#556;text-decoration:none;" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#556'">Cookie Policy</a>
+  </p>
 </footer>
+
+<!-- ── COOKIE CONSENT BANNER ── -->
+<div id="cookie-banner" style="
+  display:none;
+  position:fixed;
+  bottom:0; left:0; right:0;
+  background:rgba(10,10,30,0.97);
+  border-top:1px solid rgba(0,212,255,0.3);
+  padding:16px 24px;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  backdrop-filter:blur(10px);
+">
+  <p style="margin:0;font-size:13px;color:#aab;max-width:700px;">
+    🍪 We use cookies and analytics (Google Analytics & Microsoft Clarity) to improve your experience.
+    <a href="privacy.html" style="color:#00d4ff;">Learn more</a>
+  </p>
+  <div style="display:flex;gap:10px;flex-shrink:0;">
+    <button onclick="declineCookies()" style="background:transparent;border:1px solid #445;color:#778;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:13px;">Decline</button>
+    <button onclick="acceptCookies()" style="background:linear-gradient(135deg,#00d4ff,#1a1aff);border:none;color:#fff;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;">Accept</button>
+  </div>
+</div>
 
 <!-- ── PARTICLES JS ── -->
 <script>
@@ -985,6 +1016,21 @@
   }
 
   setLang('en');
+
+  // ── COOKIE CONSENT ──
+  function acceptCookies() {
+    localStorage.setItem('cookie_consent', 'accepted');
+    document.getElementById('cookie-banner').style.display = 'none';
+  }
+  function declineCookies() {
+    localStorage.setItem('cookie_consent', 'declined');
+    document.getElementById('cookie-banner').style.display = 'none';
+  }
+  window.acceptCookies = acceptCookies;
+  window.declineCookies = declineCookies;
+  if (!localStorage.getItem('cookie_consent')) {
+    document.getElementById('cookie-banner').style.display = 'flex';
+  }
 
   // Smooth nav highlight
   const sections = document.querySelectorAll('section[id]');
