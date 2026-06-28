@@ -894,25 +894,13 @@
     <a href="privacy.html" style="color:#556;text-decoration:none;" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#556'">Privacy Policy</a>
     &nbsp;·&nbsp;
     <a href="privacy.html#cookies" style="color:#556;text-decoration:none;" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#556'">Cookie Policy</a>
+    &nbsp;·&nbsp;
+    <a href="#" onclick="openCookieSettings();return false;" style="color:#556;text-decoration:none;" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#556'">Cookie Settings</a>
   </p>
 </footer>
 
 <!-- ── COOKIE CONSENT BANNER ── -->
-<div id="cookie-banner" style="
-  display:none;
-  position:fixed;
-  bottom:0; left:0; right:0;
-  background:rgba(10,10,30,0.97);
-  border-top:1px solid rgba(0,212,255,0.3);
-  padding:16px 24px;
-  z-index:9999;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  flex-wrap:wrap;
-  backdrop-filter:blur(10px);
-">
+<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,30,0.97);border-top:1px solid rgba(0,212,255,0.3);padding:16px 24px;z-index:9999;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;backdrop-filter:blur(10px);">
   <p style="margin:0;font-size:13px;color:#aab;max-width:700px;">
     🍪 We use cookies and analytics (Google Analytics & Microsoft Clarity) to improve your experience.
     <a href="privacy.html" style="color:#00d4ff;">Learn more</a>
@@ -1023,20 +1011,28 @@
   setLang('en');
 
   // ── COOKIE CONSENT ──
+  const banner = document.getElementById('cookie-banner');
+
+  function showBanner() { banner.style.display = 'flex'; }
+  function hideBanner() { banner.style.display = 'none'; }
+
   function acceptCookies() {
     localStorage.setItem('cookie_consent', 'accepted');
-    document.getElementById('cookie-banner').style.display = 'none';
+    hideBanner();
     loadAnalytics();
   }
   function declineCookies() {
     localStorage.setItem('cookie_consent', 'declined');
-    document.getElementById('cookie-banner').style.display = 'none';
+    hideBanner();
   }
+  function openCookieSettings() { showBanner(); }
+
   window.acceptCookies = acceptCookies;
   window.declineCookies = declineCookies;
-  if (!localStorage.getItem('cookie_consent')) {
-    document.getElementById('cookie-banner').style.display = 'flex';
-  }
+  window.openCookieSettings = openCookieSettings;
+
+  // Show banner only if no decision made yet
+  if (!localStorage.getItem('cookie_consent')) showBanner();
 
   // Smooth nav highlight
   const sections = document.querySelectorAll('section[id]');
