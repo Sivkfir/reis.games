@@ -1548,6 +1548,112 @@ spaceBtn.addEventListener('touchstart', e => {
   <a href="https://reis.games/">REI Games Studio</a>
   <a href="https://reis.games/privacy.html">Privacy Policy</a>
   <a href="https://reis.games/cookie-policy.html">Cookie Policy</a>
+  <a href="#" onclick="openCookieSettings();return false;">Cookie Settings</a>
 </div>
+
+<!-- ── COOKIE BANNER ── -->
+<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#111;color:#eee;padding:14px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;border-top:2px solid #333;font-family:sans-serif;font-size:13px;">
+  <span style="flex:1;min-width:200px;">We use cookies for analytics and ads. <a href="https://reis.games/cookie-policy.html" style="color:#7ecfff;">Learn more</a></span>
+  <button onclick="rejectNonEssential()" style="background:#333;color:#ccc;border:1px solid #555;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;">Reject Non-Essential</button>
+  <button onclick="openCookiePrefs()" style="background:#444;color:#fff;border:1px solid #666;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;">Manage Preferences</button>
+  <button onclick="acceptAllCookies()" style="background:#4caf50;color:#fff;border:none;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;">Accept All</button>
+</div>
+
+<!-- ── COOKIE MODAL ── -->
+<div id="cookie-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;">
+  <div style="background:#1a1a1a;color:#eee;border-radius:12px;padding:28px;max-width:420px;width:90%;font-family:sans-serif;font-size:13px;border:1px solid #333;">
+    <h3 style="margin:0 0 14px;font-size:16px;">Cookie Preferences</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #2a2a2a;">
+      <div><strong>Essential</strong><br><span style="color:#888;font-size:11px;">Required for the site to work</span></div>
+      <input type="checkbox" checked disabled style="width:18px;height:18px;">
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #2a2a2a;">
+      <div><strong>Analytics</strong><br><span style="color:#888;font-size:11px;">Google Analytics &amp; Microsoft Clarity</span></div>
+      <input type="checkbox" id="pref-analytics" style="width:18px;height:18px;">
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #2a2a2a;">
+      <div><strong>Advertising</strong><br><span style="color:#888;font-size:11px;">Personalized ads (planned)</span></div>
+      <input type="checkbox" id="pref-advertising" style="width:18px;height:18px;">
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end;">
+      <button onclick="closeCookiePrefs()" style="background:#333;color:#ccc;border:1px solid #555;padding:8px 16px;border-radius:6px;cursor:pointer;">Cancel</button>
+      <button onclick="saveCookiePrefs()" style="background:#4caf50;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:bold;">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const GA_ID = 'G-0DXQGP2520';
+  const CLARITY_ID = 'xdfhcbeuy2';
+
+  function getPrefs(){
+    try{ return JSON.parse(localStorage.getItem('cookie_prefs')||'{}'); }catch(e){ return {}; }
+  }
+  function setPrefs(p){
+    localStorage.setItem('cookie_prefs', JSON.stringify(p));
+    localStorage.setItem('cookie_banner_dismissed','1');
+  }
+
+  function loadGA(){
+    if(window._gaLoaded) return; window._gaLoaded=true;
+    window.dataLayer=window.dataLayer||[];
+    window.gtag=function(){dataLayer.push(arguments);};
+    const s=document.createElement('script'); s.async=true;
+    s.src='https://www.googletagmanager.com/gtag/js?id='+GA_ID;
+    document.head.appendChild(s);
+    gtag('js',new Date()); gtag('config',GA_ID);
+  }
+  function loadClarity(){
+    if(window._clarityLoaded) return; window._clarityLoaded=true;
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r); t.async=1; t.src='https://www.clarity.ms/tag/'+i;
+      y=l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t,y);
+    })(window,document,'clarity','script',CLARITY_ID);
+  }
+
+  function applyPrefs(p){
+    if(p.analytics){ loadGA(); loadClarity(); }
+  }
+
+  window.acceptAllCookies=function(){
+    const p={essential:true,analytics:true,advertising:true};
+    setPrefs(p); applyPrefs(p); hideBanner();
+  };
+  window.rejectNonEssential=function(){
+    setPrefs({essential:true,analytics:false,advertising:false}); hideBanner();
+  };
+  window.openCookiePrefs=function(){
+    const p=getPrefs();
+    document.getElementById('pref-analytics').checked=!!p.analytics;
+    document.getElementById('pref-advertising').checked=!!p.advertising;
+    document.getElementById('cookie-modal').style.display='flex';
+  };
+  window.closeCookiePrefs=function(){
+    document.getElementById('cookie-modal').style.display='none';
+  };
+  window.saveCookiePrefs=function(){
+    const p={essential:true,
+      analytics:document.getElementById('pref-analytics').checked,
+      advertising:document.getElementById('pref-advertising').checked};
+    setPrefs(p); applyPrefs(p); closeCookiePrefs(); hideBanner();
+  };
+  window.openCookieSettings=function(){
+    openCookiePrefs();
+  };
+
+  function hideBanner(){ document.getElementById('cookie-banner').style.display='none'; }
+  function showBanner(){ document.getElementById('cookie-banner').style.display='flex'; }
+
+  // On load: apply saved prefs or show banner
+  const saved=getPrefs();
+  if(localStorage.getItem('cookie_banner_dismissed')==='1'){
+    applyPrefs(saved);
+  } else {
+    showBanner();
+  }
+})();
+</script>
 </body>
 </html>

@@ -806,60 +806,8 @@
     <p data-i18n="games_sub">בחר משחק ותתחיל את ההרפתקה</p>
   </div>
 
-  <div class="games-grid">
-
-    <!-- Game 1 -->
-    <div class="game-card">
-      <div class="game-thumb">🧟<div class="game-tag">LIVE</div></div>
-      <div class="game-info">
-        <h3>Zombie Slayer</h3>
-        <p data-i18n="game1_desc">שרוד את היער, מצא אוצרות והביס את הבוס! WASD לתנועה, לחיצה להחרבה.</p>
-        <div class="game-footer">
-          <span class="game-rating">⭐⭐⭐⭐⭐</span>
-          <button class="play-btn" data-i18n="play" onclick="gtag('event','click',{event_category:'game',event_label:'zombie_slayer_play'});window.location='zombie-slayer/index.html'">שחק ▶</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Game 2 -->
-    <div class="game-card coming-soon">
-      <div class="game-thumb">🏎️<div class="game-tag coming-tag" data-i18n="coming_soon">בקרוב</div></div>
-      <div class="game-info">
-        <h3>Turbo Pixel</h3>
-        <p data-i18n="game2_desc">מירוץ פיקסל-ארט בשמונה מסלולים שונים עם שדרוגי טורבו.</p>
-        <div class="game-footer">
-          <span class="game-rating">🔒 <span data-i18n="coming_soon">בקרוב</span></span>
-          <button class="play-btn" style="opacity:.5;cursor:default" data-i18n="coming_soon">בקרוב</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Game 3 -->
-    <div class="game-card coming-soon">
-      <div class="game-thumb">⚔️<div class="game-tag coming-tag" data-i18n="coming_soon">בקרוב</div></div>
-      <div class="game-info">
-        <h3>Dungeon REI</h3>
-        <p data-i18n="game3_desc">dungeon crawler עם אריחים, מפלצות וניצחונות אגדיים.</p>
-        <div class="game-footer">
-          <span class="game-rating">🔒 <span data-i18n="coming_soon">בקרוב</span></span>
-          <button class="play-btn" style="opacity:.5;cursor:default" data-i18n="coming_soon">בקרוב</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Game 4 -->
-    <div class="game-card coming-soon">
-      <div class="game-thumb">🌌<div class="game-tag coming-tag" data-i18n="coming_soon">בקרוב</div></div>
-      <div class="game-info">
-        <h3>Space Pixel</h3>
-        <p data-i18n="game4_desc">ירי חלל קלאסי עם גלים, בוסים ונשק מתקדם.</p>
-        <div class="game-footer">
-          <span class="game-rating">🔒 <span data-i18n="coming_soon">בקרוב</span></span>
-          <button class="play-btn" style="opacity:.5;cursor:default" data-i18n="coming_soon">בקרוב</button>
-        </div>
-      </div>
-    </div>
-
+  <div class="games-grid" id="games-grid">
+    <!-- Rendered dynamically by renderGames() from games.js -->
   </div>
 </section>
 
@@ -1083,6 +1031,42 @@
   function toggleLang() {
     setLang(currentLang === 'he' ? 'en' : 'he');
   }
+
+  // ─── GAMES GRID ───────────────────────────────────────────
+  function renderGames() {
+    const grid = document.getElementById('games-grid');
+    if (!grid || typeof GAMES === 'undefined') return;
+    const lang = currentLang;
+    const t = translations[lang];
+    grid.innerHTML = GAMES.map(g => {
+      const live    = g.status === 'live';
+      const tagHtml = live
+        ? `<div class="game-tag">LIVE</div>`
+        : `<div class="game-tag coming-tag">${t.coming_soon}</div>`;
+      const thumbStyle = g.thumbBg ? ` style="background:${g.thumbBg}"` : '';
+      const descText = lang === 'he' ? g.descHe : g.descEn;
+      const footerHtml = live
+        ? `<span class="game-rating">⭐⭐⭐⭐⭐</span>
+           <button class="play-btn" onclick="gtag&&gtag('event','click',{event_category:'game',event_label:'${g.id}_play'});window.location='${g.url}'">${t.play}</button>`
+        : `<span class="game-rating">🔒 ${t.coming_soon}</span>
+           <button class="play-btn" style="opacity:.5;cursor:default">${t.coming_soon}</button>`;
+      return `<div class="game-card${live ? '' : ' coming-soon'}">
+        <div class="game-thumb"${thumbStyle}>${g.emoji}${tagHtml}</div>
+        <div class="game-info">
+          <h3>${g.title}</h3>
+          <p data-game-desc="${g.id}">${descText}</p>
+          <div class="game-footer">${footerHtml}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // patch setLang to also refresh game descriptions
+  const _origSetLang = setLang;
+  setLang = function(lang) {
+    _origSetLang(lang);
+    renderGames();
+  };
 
   setLang('en');
 
