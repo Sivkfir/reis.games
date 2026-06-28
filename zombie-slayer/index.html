@@ -100,6 +100,10 @@ const ctx = canvas.getContext('2d');
 const W = canvas.width  = 800;
 const H = canvas.height = 600;
 
+// preload logo
+const logoImg = new Image();
+logoImg.src = '../logo-white.png';
+
 // ─── UTILS ───────────────────────────────────────────────
 const rand  = (a,b) => Math.random()*(b-a)+a;
 const randI = (a,b) => Math.floor(rand(a,b));
@@ -953,47 +957,105 @@ function drawMinimap(){
 
 // ─── SCREENS ─────────────────────────────────────────────
 function drawTitle(){
-  ctx.fillStyle='#060e04';ctx.fillRect(0,0,W,H);
-  // animated fog
   const t=Date.now()*0.001;
-  ctx.fillStyle='rgba(0,20,0,0.08)';
-  for(let i=0;i<6;i++){
-    const fx=(Math.sin(t*0.3+i*1.1)*0.5+0.5)*W, fy=(Math.cos(t*0.2+i*0.9)*0.5+0.5)*H;
-    ctx.beginPath();ctx.arc(fx,fy,80+Math.sin(t+i)*20,0,Math.PI*2);ctx.fill();
+
+  // background
+  ctx.fillStyle='#04080a';ctx.fillRect(0,0,W,H);
+
+  // animated red/blood fog blobs
+  for(let i=0;i<5;i++){
+    const fx=(Math.sin(t*0.25+i*1.3)*0.5+0.5)*W;
+    const fy=(Math.cos(t*0.18+i*1.1)*0.5+0.5)*H;
+    const gr=ctx.createRadialGradient(fx,fy,0,fx,fy,160+Math.sin(t+i)*30);
+    gr.addColorStop(0,i<2?'rgba(120,0,0,0.10)':'rgba(0,30,10,0.10)');
+    gr.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
   }
-  // silhouette trees
-  ctx.fillStyle='rgba(0,0,0,0.6)';
-  for(let i=0;i<10;i++){
-    const tx=i*90+Math.sin(t*0.3+i)*15;
-    ctx.fillRect(tx-6,300,12,H);
-    ctx.beginPath();ctx.arc(tx,295,28+i%3*8,Math.PI,0);ctx.fill();
-    ctx.beginPath();ctx.arc(tx,270,22+i%3*5,Math.PI,0);ctx.fill();
-    ctx.beginPath();ctx.arc(tx,250,16+i%3*4,Math.PI,0);ctx.fill();
+
+  // silhouette trees (bottom)
+  for(let i=0;i<12;i++){
+    const tx=i*75+Math.sin(t*0.2+i)*8;
+    const h=140+i%3*40;
+    ctx.fillStyle=`rgba(0,0,0,${0.7+i%2*0.15})`;
+    ctx.fillRect(tx-5,H-h,10,h);
+    ctx.beginPath();ctx.arc(tx,H-h,22+i%3*9,Math.PI,0);ctx.fill();
+    ctx.beginPath();ctx.arc(tx,H-h-22,16+i%3*6,Math.PI,0);ctx.fill();
+    ctx.beginPath();ctx.arc(tx,H-h-38,11+i%3*4,Math.PI,0);ctx.fill();
   }
-  // fog layer
-  const fog=ctx.createLinearGradient(0,H*0.4,0,H);
-  fog.addColorStop(0,'rgba(0,8,0,0)');fog.addColorStop(1,'rgba(0,8,0,0.7)');
+
+  // fog ground
+  const fog=ctx.createLinearGradient(0,H-120,0,H);
+  fog.addColorStop(0,'rgba(0,0,0,0)');fog.addColorStop(1,'rgba(10,0,0,0.85)');
   ctx.fillStyle=fog;ctx.fillRect(0,0,W,H);
-  // title
+
+  // top fog
+  const fog2=ctx.createLinearGradient(0,0,0,80);
+  fog2.addColorStop(0,'rgba(0,0,0,0.6)');fog2.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=fog2;ctx.fillRect(0,0,W,H);
+
   ctx.textAlign='center';
-  ctx.shadowColor='#ff0000';ctx.shadowBlur=35;
-  ctx.fillStyle='#dd1111';ctx.font='bold 72px monospace';ctx.fillText('ZOMBIE',W/2,160);
-  ctx.fillStyle='#ffdd00';ctx.font='bold 78px monospace';ctx.fillText('SLAYER',W/2,248);
+
+  // REI Games Studio logo image (top center)
+  if(logoImg.complete && logoImg.naturalWidth>0){
+    const lw=160, lh=lw*(logoImg.naturalHeight/logoImg.naturalWidth);
+    ctx.globalAlpha=0.92;
+    ctx.drawImage(logoImg, W/2-lw/2, 22, lw, lh);
+    ctx.globalAlpha=1;
+  } else {
+    // fallback text
+    ctx.fillStyle='#00d4ff'; ctx.font='bold 13px monospace';
+    ctx.shadowColor='#00d4ff'; ctx.shadowBlur=8;
+    ctx.fillText('⚡ REI GAMES STUDIO ⚡', W/2, 44);
+    ctx.shadowBlur=0;
+  }
+
+  // ZOMBIE SLAYER title
+  const pulse=0.92+Math.sin(t*2)*0.08;
+  ctx.save(); ctx.translate(W/2, 210); ctx.scale(pulse, pulse);
+  ctx.shadowColor='#ff0000'; ctx.shadowBlur=50;
+  ctx.fillStyle='#cc0000'; ctx.font='bold 86px monospace';
+  ctx.fillText('ZOMBIE',0,0);
+  ctx.shadowColor='#ff6600'; ctx.shadowBlur=30;
+  ctx.fillStyle='#ff4400'; ctx.font='bold 92px monospace';
+  ctx.fillText('SLAYER',0,88);
+  ctx.restore(); ctx.shadowBlur=0;
+
+  // tagline
+  ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(W/2-210,316,420,24);
+  ctx.fillStyle='#88bb66'; ctx.font='14px monospace';
+  ctx.fillText('Survive the forest · Find treasure · Defeat the Boss',W/2,333);
+
+  // controls row
+  ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fillRect(W/2-220,348,440,36);
+  ctx.fillStyle='#556655'; ctx.font='12px monospace';
+  ctx.fillText('WASD / 🕹 Move   •   Mouse / Tap ⚔️ Attack   •   Walk into 📦 to open',W/2,360);
+  ctx.fillStyle='#445544'; ctx.font='11px monospace';
+  ctx.fillText('💎 Health Crystal   •   🛡️ Golden Shield   •   ⚡ Rei Sword',W/2,376);
+
+  // PLAY NOW button
+  const bp=0.88+Math.sin(t*3)*0.12;
+  ctx.save(); ctx.translate(W/2, 430);
+  const bw=240, bh=52;
+  // glow
+  ctx.shadowColor='#ff2200'; ctx.shadowBlur=30*bp;
+  // button bg gradient
+  const bg=ctx.createLinearGradient(-bw/2,0,bw/2,0);
+  bg.addColorStop(0,'#8b0000'); bg.addColorStop(0.5,'#cc2200'); bg.addColorStop(1,'#8b0000');
+  ctx.fillStyle=bg;
+  rr(ctx,-bw/2,-bh/2,bw,bh,14); ctx.fill();
+  // border
+  ctx.strokeStyle=`rgba(255,${80+Math.floor(bp*80)},0,0.9)`; ctx.lineWidth=2;
+  ctx.stroke();
   ctx.shadowBlur=0;
-  ctx.fillStyle='#88bb66';ctx.font='15px monospace';ctx.fillText('Survive the forest. Find treasure. Defeat the Boss.',W/2,294);
-  ctx.fillStyle='#607060';ctx.font='13px monospace';
-  ctx.fillText('WASD / Joystick – Move    Mouse / Tap – Aim & Swing ⚔️',W/2,358);
-  ctx.fillText('Walk near a chest → Press SPACE or tap 📦 to open',W/2,378);
-  ctx.fillText('Find 3 chests: 💎 +HP   🛡️ Golden Shield   ⚡ Rei Sword',W/2,398);
-  // Start button
-  const pulse2=0.85+Math.sin(Date.now()/300)*0.15;
-  ctx.shadowColor='#ffd700'; ctx.shadowBlur=20*pulse2;
-  ctx.fillStyle='#ffd700';
-  rr(ctx, W/2-140, 418, 280, 54, 14); ctx.fill();
-  ctx.shadowBlur=0;
-  ctx.fillStyle='#000'; ctx.font='bold 22px monospace'; ctx.textAlign='center';
-  ctx.fillText('▶  התחל לשחק  ◀', W/2, 452);
-  ctx.fillStyle='#334433';ctx.font='12px monospace';ctx.fillText('⚡ REI GAMES STUDIO ⚡',W/2,H-18);
+  // text
+  ctx.fillStyle='#fff'; ctx.font='bold 24px monospace';
+  ctx.shadowColor='#000'; ctx.shadowBlur=4;
+  ctx.fillText('▶  PLAY NOW',0,9);
+  ctx.restore(); ctx.shadowBlur=0;
+
+  // ENTER hint
+  ctx.fillStyle='#334433'; ctx.font='11px monospace';
+  ctx.fillText('press ENTER or tap to start',W/2,H-12);
   ctx.textAlign='left';
 }
 
