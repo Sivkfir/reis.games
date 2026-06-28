@@ -136,27 +136,35 @@ const tileCanvas = document.createElement('canvas');
 tileCanvas.width = tileCanvas.height = TILE_SZ;
 const tc = tileCanvas.getContext('2d');
 (function(){
-  tc.fillStyle='#1a2e0a'; tc.fillRect(0,0,TILE_SZ,TILE_SZ);
-  for(let i=0;i<80;i++){
-    const gx=rand(0,TILE_SZ), gy=rand(0,TILE_SZ), gr=rand(15,60);
+  tc.fillStyle='#0b1204'; tc.fillRect(0,0,TILE_SZ,TILE_SZ);
+  // dark green moss patches
+  for(let i=0;i<90;i++){
+    const gx=rand(0,TILE_SZ),gy=rand(0,TILE_SZ),gr=rand(10,52);
     const g=tc.createRadialGradient(gx,gy,0,gx,gy,gr);
-    const h=randI(90,140), l=randI(10,22);
-    g.addColorStop(0,`hsla(${h},55%,${l+8}%,0.7)`);
-    g.addColorStop(1,`hsla(${h},55%,${l}%,0)`);
+    const h=randI(100,135),l=randI(5,14);
+    g.addColorStop(0,`hsla(${h},48%,${l+5}%,0.8)`);
+    g.addColorStop(1,`hsla(${h},48%,${l}%,0)`);
     tc.fillStyle=g; tc.beginPath(); tc.arc(gx,gy,gr,0,Math.PI*2); tc.fill();
   }
-  // dirt patches
-  for(let i=0;i<12;i++){
-    const gx=rand(0,TILE_SZ), gy=rand(0,TILE_SZ), gr=rand(10,30);
+  // dark rot/mud patches
+  for(let i=0;i<22;i++){
+    const gx=rand(0,TILE_SZ),gy=rand(0,TILE_SZ),gr=rand(10,32);
     const g=tc.createRadialGradient(gx,gy,0,gx,gy,gr);
-    g.addColorStop(0,'rgba(60,35,5,0.5)'); g.addColorStop(1,'rgba(60,35,5,0)');
+    g.addColorStop(0,'rgba(18,6,1,0.72)'); g.addColorStop(1,'rgba(18,6,1,0)');
     tc.fillStyle=g; tc.beginPath(); tc.arc(gx,gy,gr,0,Math.PI*2); tc.fill();
   }
-  // roots
-  tc.strokeStyle='rgba(20,10,0,0.3)'; tc.lineWidth=1.5;
-  for(let i=0;i<10;i++){
-    const rx=rand(0,TILE_SZ), ry=rand(0,TILE_SZ);
-    tc.beginPath(); tc.moveTo(rx,ry); tc.quadraticCurveTo(rx+rand(-20,20),ry+rand(-20,20),rx+rand(-30,30),ry+rand(-30,30)); tc.stroke();
+  // old stains / puddles
+  for(let i=0;i<8;i++){
+    const gx=rand(0,TILE_SZ),gy=rand(0,TILE_SZ),gr=rand(6,16);
+    const g=tc.createRadialGradient(gx,gy,0,gx,gy,gr);
+    g.addColorStop(0,'rgba(40,4,0,0.45)'); g.addColorStop(1,'rgba(40,4,0,0)');
+    tc.fillStyle=g; tc.beginPath(); tc.arc(gx,gy,gr,0,Math.PI*2); tc.fill();
+  }
+  // roots & cracks
+  tc.strokeStyle='rgba(6,3,0,0.4)'; tc.lineWidth=1.5;
+  for(let i=0;i<16;i++){
+    const rx=rand(0,TILE_SZ),ry=rand(0,TILE_SZ);
+    tc.beginPath(); tc.moveTo(rx,ry); tc.quadraticCurveTo(rx+rand(-28,28),ry+rand(-28,28),rx+rand(-40,40),ry+rand(-40,40)); tc.stroke();
   }
 })();
 
@@ -195,6 +203,15 @@ const treeCaches = TREES.map(t=>{
 const DECO = [];
 for(let i=0;i<180;i++){
   DECO.push({x:rand(0,WORLD),y:rand(0,WORLD),type:Math.random()<0.35?'rock':Math.random()<0.5?'shroom':'bush',s:rand(0.6,1.4)});
+}
+
+// ─── BLOOD DECALS ────────────────────────────────────────
+const bloodDecals=[];
+function spawnBlood(wx,wy){
+  for(let i=0;i<4+randI(0,4);i++){
+    bloodDecals.push({wx:wx+rand(-24,24),wy:wy+rand(-18,18),rx:rand(4,18),ry:rand(3,11),ang:rand(0,Math.PI),alpha:rand(0.28,0.6)});
+  }
+  if(bloodDecals.length>160) bloodDecals.splice(0,bloodDecals.length-160);
 }
 
 // ─── PARTICLES ───────────────────────────────────────────
@@ -334,6 +351,13 @@ function updatePlayer(){
   const spd=player.speed*(player.speedBoost>0?1.7:1);
   player.x=wrap(player.x+dx*spd,WORLD);
   player.y=wrap(player.y+dy*spd,WORLD);
+  // tree collision
+  for(const t of TREES){
+    const tdx=wrapD(player.x,t.x,WORLD),tdy=wrapD(player.y,t.y,WORLD);
+    const td=Math.hypot(tdx,tdy);
+    const minD=14+Math.max(t.r*0.32,9);
+    if(td<minD&&td>0.1){player.x=wrap(t.x+(tdx/td)*minD,WORLD);player.y=wrap(t.y+(tdy/td)*minD,WORLD);}
+  }
   player.angle=Math.atan2(mouse.y-H/2,mouse.x-W/2);
   if(player.swingCD>0)player.swingCD--;
   if(mouse.down&&player.swingCD===0&&!player.swinging){player.swinging=true;player.swingT=0;player.hits.clear();}
@@ -368,6 +392,7 @@ function swordHits(){
         z.dead=true;player.kills++;
         addKillCombo();
         spawnP(z.x,z.y,'#cc3300',18,4);
+        spawnBlood(z.x,z.y);
         spawnDrop(z.x,z.y);
         if(z.isBoss){bossKilled=true;gtag('event','game_win',{event_category:'zombie_slayer',value:player.kills});}
       }
@@ -564,7 +589,7 @@ let lootMsg=null,lootTimer=0;
 function initChests(){
   chests.length=0;
   // 2 rare chests — one nearby, one far
-  chests.push({x:WORLD/2+350, y:WORLD/2-250, open:false, anim:0, loot:LOOT[0]}); // Golden Shield — visible early
+  chests.push({x:WORLD/2+160, y:WORLD/2+120, open:false, anim:0, loot:LOOT[0]}); // Golden Shield — closer to start
   chests.push({x:WORLD*0.8,   y:WORLD*0.2,   open:false, anim:0, loot:LOOT[1]}); // Rei Sword — far reward
 }
 
@@ -678,22 +703,27 @@ function drawChests(camX,camY){
     // ── PROXIMITY PROMPT ──────────────────────────────────
     if(!c.open){
       const d=Math.hypot(wrapD(player.x,c.x,WORLD),wrapD(player.y,c.y,WORLD));
-      if(d<140){
-        const fa=clamp((140-d)/100,0,1);
+      if(d<160){
+        const fa=clamp((160-d)/120,0,1);
         ctx.globalAlpha=fa;
         if(isNear){
-          // BIG flashing SPACE prompt
-          const flash=Math.floor(Date.now()/350)%2===0;
-          ctx.fillStyle=flash?'#ffd700':'#fff';
-          ctx.shadowColor='#ffd700'; ctx.shadowBlur=14;
-          ctx.font='bold 14px monospace'; ctx.textAlign='center';
-          ctx.fillText('📦 OPEN CHEST',0,-50);
-          ctx.font='12px monospace'; ctx.fillStyle='#ffeeaa';
-          ctx.fillText('SPACE / tap 📦',0,-68);
+          const flash=Math.floor(Date.now()/400)%2===0;
+          // panel
+          ctx.fillStyle='rgba(0,0,0,0.75)';
+          rr(ctx,-90,-82,180,52,10); ctx.fill();
+          ctx.strokeStyle=flash?'#ffd700':'rgba(180,140,0,0.5)'; ctx.lineWidth=1.5;
+          rr(ctx,-90,-82,180,52,10); ctx.stroke();
+          // text
+          ctx.font='bold 13px Orbitron, monospace'; ctx.textAlign='center';
+          ctx.fillStyle=flash?'#ffd700':'#ccaa00';
+          ctx.shadowColor='#ffd700'; ctx.shadowBlur=flash?14:0;
+          ctx.fillText('OPEN CHEST',0,-58);
+          ctx.font='10px Orbitron, monospace'; ctx.fillStyle='#aa8800'; ctx.shadowBlur=0;
+          ctx.fillText('SPACE  /  tap button',0,-40);
+          // arrow down
+          ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd700'; ctx.shadowBlur=8;
+          ctx.beginPath(); ctx.moveTo(-10,-30); ctx.lineTo(10,-30); ctx.lineTo(0,-20); ctx.closePath(); ctx.fill();
           ctx.shadowBlur=0;
-          // arrow pointing down to chest
-          ctx.fillStyle='#ffd700';
-          ctx.beginPath(); ctx.moveTo(-8,-42); ctx.lineTo(8,-42); ctx.lineTo(0,-34); ctx.closePath(); ctx.fill();
         }
         ctx.globalAlpha=1;
       }
@@ -853,6 +883,14 @@ function drawForest(camX,camY){
     }
   }
 
+  // blood decals on ground
+  for(const b of bloodDecals){
+    const sx=((b.wx-camX+W/2)%W+W)%W,sy=((b.wy-camY+H/2)%H+H)%H;
+    ctx.globalAlpha=b.alpha; ctx.fillStyle='#5a0000';
+    ctx.beginPath(); ctx.ellipse(sx,sy,b.rx,b.ry,b.ang,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+
   // trees — collect visible, sort by Y
   const vis=[];
   for(let i=0;i<TREES.length;i++){
@@ -885,6 +923,25 @@ function drawForest(camX,camY){
 function drawRock(){ctx.fillStyle='#4a4a4a';ctx.beginPath();ctx.ellipse(0,0,10,7,0.3,0,Math.PI*2);ctx.fill();ctx.fillStyle='#666';ctx.beginPath();ctx.ellipse(-2,-1,6,4,0.2,0,Math.PI*2);ctx.fill();}
 function drawShroom(){ctx.fillStyle='#e8e8d0';ctx.fillRect(-3,0,6,8);ctx.fillStyle='#cc3322';ctx.beginPath();ctx.ellipse(0,-2,10,8,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-4,-3,2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(3,-2,1.5,0,Math.PI*2);ctx.fill();}
 function drawBush(){ctx.fillStyle='#1a4010';ctx.beginPath();ctx.arc(-5,0,8,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(5,0,8,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(0,-4,9,0,Math.PI*2);ctx.fill();ctx.fillStyle='#2a5518';ctx.beginPath();ctx.arc(-3,-2,5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(3,-3,5,0,Math.PI*2);ctx.fill();}
+
+// ─── FOG OF WAR / LANTERN ────────────────────────────────
+function drawFogOfWar(){
+  const flk=1+Math.sin(Date.now()*0.009)*0.018+Math.sin(Date.now()*0.0173)*0.011;
+  const lightR=(player.speedBoost>0?340:player.hp<=1?185:265)*flk;
+  const cx=W/2,cy=H/2;
+  const fog=ctx.createRadialGradient(cx,cy,lightR*0.28,cx,cy,lightR);
+  fog.addColorStop(0,'rgba(0,0,0,0)');
+  fog.addColorStop(0.5,'rgba(0,0,0,0)');
+  fog.addColorStop(0.76,'rgba(0,3,0,0.6)');
+  fog.addColorStop(1,'rgba(0,0,0,0.97)');
+  ctx.fillStyle=fog; ctx.fillRect(0,0,W,H);
+  // warm torch tint (redder when low hp)
+  const hpF=player.hp/player.maxHp;
+  const warm=ctx.createRadialGradient(cx,cy,0,cx,cy,lightR*0.55);
+  warm.addColorStop(0,hpF<0.4?'rgba(200,15,0,0.11)':'rgba(255,140,30,0.07)');
+  warm.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=warm; ctx.fillRect(0,0,W,H);
+}
 
 // ─── HUD ─────────────────────────────────────────────────
 function drawHUD(){
@@ -955,6 +1012,24 @@ function drawHUD(){
     ctx.fillStyle='#00ffcc'; ctx.shadowColor='#00ffcc'; ctx.shadowBlur=8;
     ctx.font='bold 9px Orbitron, monospace'; ctx.fillText('SPEED BOOST',13,98); ctx.shadowBlur=0;
   }
+
+  // ── CHEST COMPASS ──
+  const unopened=chests.filter(c=>!c.open);
+  if(unopened.length>0&&!nearChest){
+    const nc=unopened.reduce((a,b)=>Math.hypot(wrapD(player.x,a.x,WORLD),wrapD(player.y,a.y,WORLD))<Math.hypot(wrapD(player.x,b.x,WORLD),wrapD(player.y,b.y,WORLD))?a:b);
+    const ang=Math.atan2(wrapD(nc.y,player.y,WORLD),wrapD(nc.x,player.x,WORLD));
+    const dist=Math.hypot(wrapD(player.x,nc.x,WORLD),wrapD(player.y,nc.y,WORLD));
+    const bx=W/2+Math.cos(ang)*58,by=H/2+Math.sin(ang)*58;
+    ctx.save(); ctx.translate(bx,by); ctx.rotate(ang+Math.PI/2);
+    ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd700'; ctx.shadowBlur=10;
+    ctx.globalAlpha=0.75+Math.sin(Date.now()*0.006)*0.25;
+    ctx.beginPath(); ctx.moveTo(0,-10); ctx.lineTo(6,6); ctx.lineTo(0,2); ctx.lineTo(-6,6); ctx.closePath(); ctx.fill();
+    ctx.restore();
+    ctx.shadowBlur=0; ctx.globalAlpha=1;
+    ctx.font='bold 9px Orbitron, monospace'; ctx.textAlign='center'; ctx.fillStyle='#aa8800';
+    ctx.fillText(`CHEST ${Math.round(dist)}m`,bx,by+18);
+  }
+  ctx.textAlign='left';
 
   // ── ZOMBIE COUNT ──
   const alive=zombies.filter(z=>!z.dead).length;
@@ -1186,7 +1261,7 @@ let gameState='title';
 function startGame(){
   player.x=WORLD/2;player.y=WORLD/2;player.hp=5;player.maxHp=5;player.invincible=0;
   player.kills=0;player.walkT=0;player.swinging=false;player.swingCD=0;player.sword=SWORD_WOOD;player.speedBoost=0;
-  zombies.length=0;particles.length=0;trail.length=0;drops.length=0;dmgNums.length=0;
+  zombies.length=0;particles.length=0;trail.length=0;drops.length=0;dmgNums.length=0;bloodDecals.length=0;
   wave=1;bossSpawned=false;bossKilled=false;lootMsg=null;lootTimer=0;
   combo=0;comboTimer=0;comboDisplay=0;comboDisplayTimer=0;shakeFrames=0;waveAnnounce=90;
   initChests();spawnWave(1);gameState='play';
@@ -1212,6 +1287,7 @@ function loop(){
   updateDrops(camX,camY);
   for(const z of zombies){if(!z.dead)drawZombie(z,camX,camY);}
   drawPlayer();
+  drawFogOfWar();
   updateDmgNums(camX,camY);
   updatePlayer();updateZombies();updateP();updateCombo();
   drawHUD();drawMinimap();drawWaveAnnounce();
