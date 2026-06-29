@@ -48,33 +48,70 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#060409; margin:0; padding:0; overflow-x: hidden; }
+
+/* ── GAME CONTAINER ── */
 #game-container {
   position: relative;
   width: 100%;
-  height: calc(100vh - 44px);   /* fallback */
-  height: calc(100dvh - 44px);  /* excludes mobile browser chrome */
+  height: calc(100vh - 44px);
+  height: calc(100dvh - 44px);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   touch-action: none;
-  background: #000;
+  /* Forest dark — the "frame" blends with the game atmosphere */
+  background: radial-gradient(ellipse at center, #0d1a06 0%, #060409 60%);
 }
 #wrapper { position: relative; width: 100%; height: 100%; }
-canvas { display: block; cursor: crosshair; }
+canvas { display: block; cursor: crosshair; touch-action: none; }
 
-/*
-  Mobile fix: limit container height to the canvas's natural height
-  (viewport-width × 0.75 = 800:600 aspect ratio).
-  This removes the ~500px of empty black background below the canvas
-  that was blocking scroll initiation with touch-action:none.
-  resizeGame() still handles scale via CSS transform.
-*/
+/* ── MOBILE LAYOUT ── */
 @media (pointer: coarse) {
-  #game-container {
-    height: min(calc(100vh  - 44px), calc(100vw * 0.75)); /* fallback */
-    height: min(calc(100dvh - 44px), calc(100vw * 0.75)); /* modern */
+  /* Topbar: compact */
+  .game-topbar {
+    height: 36px !important;
   }
+
+  /* Game container: fill entire viewport.
+     touch-action: pan-y on the atmospheric frame (above/below canvas)
+     lets the user initiate a vertical scroll from those areas.
+     Canvas itself has touch-action:none (see above) so game input is unaffected. */
+  #game-container {
+    height: calc(100vh - 36px);
+    height: calc(100dvh - 36px);
+    touch-action: pan-y;
+  }
+
+  /* Ad placeholders: completely hidden on mobile */
+  .ad-placeholder { display: none !important; }
+
+  /* Keyboard controls block: not relevant on mobile */
+  .controls-keyboard { display: none; }
+
+  /* Controls grid: single column since desktop block is hidden */
+  .game-controls-grid { grid-template-columns: 1fr; }
+
+  /* Related games: compact strip instead of cards */
+  .related-games-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .related-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 6px;
+  }
+  .related-card::after {
+    content: '›';
+    font-size: 18px;
+    color: #444;
+    flex-shrink: 0;
+  }
+  .related-card .rc-status { font-size: 10px; color: #555; }
 }
 
 /* ── VIRTUAL JOYSTICK ── */
@@ -166,9 +203,53 @@ canvas { display: block; cursor: crosshair; }
 .related-card:hover { border-color:rgba(0,212,255,0.3); }
 .related-card .rc-title { color:#eee; font-size:13px; margin-bottom:4px; }
 .related-card .rc-status { font-size:10px; color:#555; }
-.game-footer-bar { text-align:center; padding:12px; font-size:10px; color:#444; border-top:1px solid rgba(255,255,255,0.04); }
-.game-footer-bar a { color:#555; margin:0 8px; text-decoration:none; }
-@media(max-width:500px){ .game-controls-grid{grid-template-columns:1fr;} }
+/* ── HOW TO PLAY ACCORDION ── */
+.how-to-play {
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.how-to-play summary {
+  list-style: none;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #00d4ff;
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  background: rgba(0,212,255,0.04);
+}
+.how-to-play summary::after {
+  content: '▾';
+  margin-left: auto;
+  transition: transform 0.2s;
+  color: #555;
+}
+.how-to-play[open] summary::after { transform: rotate(180deg); }
+.how-to-play summary::-webkit-details-marker { display: none; }
+.how-to-play-body { padding: 14px 16px 16px; }
+
+/* ── FOOTER ── */
+.game-footer-bar {
+  text-align: center;
+  padding: 16px 20px;
+  font-size: 11px;
+  color: #666;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.2);
+}
+.game-footer-bar a {
+  color: #888;
+  margin: 0 10px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.game-footer-bar a:hover { color: #00d4ff; }
 </style>
 </head>
 <body>
@@ -1508,35 +1589,41 @@ spaceBtn.addEventListener('touchstart', e => {
 }, { passive: false });
 </script>
 </div><!-- close game-page-outer -->
-<!-- Ad placeholder: Rectangle below game -->
+
+<!-- Ad placeholder: Desktop only -->
 <div class="ad-placeholder ad-rectangle" style="margin:12px auto;" aria-hidden="true">[ Ad Space — 300×90 ]</div>
 
-<!-- Controls section -->
+<!-- Controls: accordion, closed by default -->
 <div class="game-info-section" style="padding-top:16px;">
-  <div class="game-controls-grid">
-    <div class="game-controls-block">
-      <h3>KEYBOARD & MOUSE</h3>
-      <ul>
-        <li>WASD — Move</li>
-        <li>Mouse — Aim</li>
-        <li>Click — Attack</li>
-        <li>SPACE / E — Open Chest</li>
-        <li>ENTER — Start / Restart</li>
-      </ul>
+  <details class="how-to-play">
+    <summary>🎮 How to Play</summary>
+    <div class="how-to-play-body">
+      <div class="game-controls-grid">
+        <div class="game-controls-block controls-keyboard">
+          <h3>KEYBOARD &amp; MOUSE</h3>
+          <ul>
+            <li>WASD — Move</li>
+            <li>Mouse — Aim</li>
+            <li>Click — Attack</li>
+            <li>SPACE / E — Open Chest</li>
+            <li>ENTER — Start / Restart</li>
+          </ul>
+        </div>
+        <div class="game-controls-block">
+          <h3>TOUCH</h3>
+          <ul>
+            <li>Left joystick — Move</li>
+            <li>Tap right side — Aim &amp; Attack</li>
+            <li>📦 button — Open Chest</li>
+          </ul>
+        </div>
+      </div>
+      <p style="font-size:11px;color:#555;margin:0;">
+        Survive all waves · Find 2 treasure chests · Defeat the Boss to win<br>
+        Drops: ❤️ Health · ⚡ Speed · 🛡️ Shield · ⚔️ Rei Sword
+      </p>
     </div>
-    <div class="game-controls-block">
-      <h3>TOUCH (MOBILE)</h3>
-      <ul>
-        <li>Left joystick — Move</li>
-        <li>Tap right side — Aim & Attack</li>
-        <li>Chest button 📦 — Open Chest</li>
-      </ul>
-    </div>
-  </div>
-  <p style="font-size:11px;color:#555;margin:0;">
-    Survive all waves · Find 2 treasure chests · Defeat the Boss to win<br>
-    Drops: ❤️ Health · ⚡ Speed boost · 🛡️ Golden Shield · ⚔️ Rei Sword
-  </p>
+  </details>
 </div>
 
 <!-- Related games -->
@@ -1544,19 +1631,15 @@ spaceBtn.addEventListener('touchstart', e => {
   <h2>MORE GAMES</h2>
   <div class="related-games-grid">
     <a href="https://reis.games/#games" class="related-card">
-      <div class="rc-title">Turbo Pixel</div>
-      <div class="rc-status">Coming Soon</div>
+      <div><div class="rc-title">Turbo Pixel</div><div class="rc-status">Coming Soon</div></div>
     </a>
     <a href="https://reis.games/#games" class="related-card">
-      <div class="rc-title">Dungeon REI</div>
-      <div class="rc-status">Coming Soon</div>
+      <div><div class="rc-title">Dungeon REI</div><div class="rc-status">Coming Soon</div></div>
     </a>
     <a href="https://reis.games/#games" class="related-card">
-      <div class="rc-title">Space Pixel</div>
-      <div class="rc-status">Coming Soon</div>
+      <div><div class="rc-title">Space Pixel</div><div class="rc-status">Coming Soon</div></div>
     </a>
   </div>
-  <!-- Ad placeholder: between related games and footer -->
   <div class="ad-placeholder ad-rectangle" style="margin:16px auto 0;" aria-hidden="true">[ Ad Space — 300×90 ]</div>
 </div>
 
