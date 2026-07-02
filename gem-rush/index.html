@@ -85,7 +85,8 @@ canvas {
 #joystick-zone {
   position:absolute;
   bottom:20px;
-  left:20px;
+  left:50%;
+  transform:translateX(-50%);
   width:110px;
   height:110px;
   border-radius:50%;
@@ -174,8 +175,8 @@ details.how-to-play[open] summary::after { content:'▴'; }
 <div id="game-container">
   <div id="wrapper">
     <canvas id="c"></canvas>
-    <div id="joystick-zone"><div id="joystick-knob"></div></div>
   </div>
+  <div id="joystick-zone"><div id="joystick-knob"></div></div>
 </div>
 
 <div class="below-fold">
@@ -186,7 +187,7 @@ details.how-to-play[open] summary::after { content:'▴'; }
       <p>Each gem disappears after ~4 seconds — catch them before they vanish!</p>
       <p>Missing a gem breaks your combo. Keep collecting to multiply your score.</p>
       <br>
-      <p><strong>Mobile:</strong> Use the joystick (bottom-left) to move.</p>
+      <p><strong>Mobile:</strong> Use the joystick (bottom-center) to move.</p>
       <p><strong>Desktop:</strong> WASD or arrow keys to move.</p>
     </div>
   </details>
