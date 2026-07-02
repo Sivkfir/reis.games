@@ -53,6 +53,44 @@ const GAMES = [
   },
 
   {
+    id: 'gem-rush',
+    title: 'Gem Rush',
+    slug: 'gem-rush',
+    tagline: 'Catch gems. Keep the combo. Beat the clock.',
+
+    descEn: 'Collect glowing gems before they vanish. Keep your combo alive for 60 seconds!',
+    descHe: 'אסוף אבני חן לפני שנעלמות. שמור על הקומבו למשך 60 שניות!',
+
+    description: 'A fast-paced arcade game. Gems spawn and disappear — collect them before time runs out and keep your combo multiplier alive.',
+    longDescription: 'Gems appear across the arena and vanish after a few seconds. Miss one and your combo resets to ×1. Chain collections to build a multiplier and rack up the highest score you can in 60 seconds. Simple to learn, hard to master.',
+
+    emoji: '💎',
+    thumbBg: 'linear-gradient(135deg, #050510 0%, #0a0a28 100%)',
+    thumbnail: '/gem-rush/thumb.svg',
+    ogImage: 'https://reis.games/logo-white.png',
+
+    category: 'arcade',
+    difficulty: 'easy',
+    status: 'live',
+    releaseDate: '2026-07',
+    version: '0.1',
+
+    url: 'gem-rush/index.html',
+
+    controls: {
+      keyboard: ['WASD / Arrow keys — Move', 'ENTER — Start / Restart'],
+      touch:    ['Left joystick — Move', 'Tap — Start / Restart'],
+    },
+    tags: ['arcade', 'casual', 'score-attack', 'combo'],
+    seo: {
+      title:       'Gem Rush — REI Games Studio',
+      description: 'Collect gems before they vanish. Keep your combo alive. 60 seconds of pure flow. Free browser game by REI Games Studio.',
+      canonical:   'https://reis.games/gem-rush/',
+    },
+    related: ['zombie-slayer', 'turbo-pixel'],
+  },
+
+  {
     id: 'turbo-pixel',
     title: 'Turbo Pixel',
     slug: 'turbo-pixel',
