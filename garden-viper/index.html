@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A smooth, modern snake game with three modes, combos and golden bonuses. Free browser game by REI Games Studio.">
+<link rel="canonical" href="https://reis.games/garden-viper/">
+<meta property="og:title" content="Garden Viper — REI Games Studio">
+<meta property="og:image" content="https://reis.games/logo-white.png">
+<!-- Analytics: loads only if the visitor accepted analytics cookies on reis.games -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  (function(){
+    let p = {}; try { p = JSON.parse(localStorage.getItem('cookie_prefs') || '{}'); } catch (e) {}
+    if (!p.analytics) return;
+    const s = document.createElement('script'); s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-0DXQGP2520';
+    document.head.appendChild(s);
+    gtag('js', new Date()); gtag('config', 'G-0DXQGP2520');
+    (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src='https://www.clarity.ms/tag/'+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,'clarity','script','xdfhcbeuy2');
+  })();
+</script>
+<title>Garden Viper — REI Games Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one-screen arcade cabinet — slim HUD on top, square mossy board, touch d-pad beneath on phones. Single committed night-garden look. */
+:root{
+  --soil:#0e1c17;      /* page ground */
+  --moss:#18352a;      /* board tile A */
+  --moss-2:#1d3d30;    /* board tile B */
+  --stone:#41544a;     /* obstacles, rules */
+  --lichen:#93b89c;    /* muted text */
+  --bone:#f0ead6;      /* primary text */
+  --coral:#ff7b54;     /* accent: the snake */
+  --amber:#ffc35e;     /* snake highlight */
+  --berry:#e8434a;     /* apple */
+  --gold:#ffd84a;      /* bonus */
+  --font-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
+body{margin:0;font-size:14px}
+html,body{height:100%}
+body{
+  background:radial-gradient(120% 80% at 50% 0%, #15302a 0%, var(--soil) 60%);
+  background-color:var(--soil);
+  color:var(--bone);
+  font-family:var(--font-display);
+  overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;-webkit-user-select:none;
+}
+.app{
+  height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  padding-block:12px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  box-sizing:border-box;
+}
+.hud{
+  width:var(--board);max-width:100%;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+}
+.brand{display:flex;flex-direction:column;gap:2px;min-width:0}
+.brand h1{
+  margin:0;font-weight:800;font-size:clamp(22px,4.4vw,32px);line-height:1;letter-spacing:-0.02em;
+  font-variation-settings:"opsz" 96;
+}
+.brand h1 span{color:var(--coral)}
+.brand .mode-tag{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--lichen);
+}
+.stats{display:flex;gap:18px;align-items:flex-end}
+.stat{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.stat b{font-family:var(--font-mono);font-weight:700;font-size:clamp(18px,3.6vw,24px);line-height:1;font-variant-numeric:tabular-nums}
+.stat small{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--lichen)}
+.stat.best b{color:var(--amber)}
+.combo{
+  width:var(--board);max-width:100%;height:6px;border-radius:3px;background:rgba(147,184,156,.12);position:relative;overflow:hidden;
+  margin-top:-6px;
+}
+.combo i{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,var(--coral),var(--amber));border-radius:3px}
+.combo-label{
+  position:absolute;right:0;top:-1px;
+}
+.stage{
+  position:relative;width:var(--board);height:var(--board);max-width:100%;
+  border-radius:14px;
+  box-shadow:0 0 0 1px rgba(240,234,214,.06), 0 24px 60px -20px rgba(0,0,0,.7);
+  touch-action:none;
+}
+canvas{display:block;width:100%;height:100%;border-radius:14px}
+.overlay{
+  position:absolute;inset:0;border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;
+  padding:24px;box-sizing:border-box;
+  background:linear-gradient(180deg, rgba(14,28,23,.55), rgba(14,28,23,.82));
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  transition:opacity .25s ease;
+}
+.overlay h2{
+  margin:0;font-weight:800;font-size:clamp(34px,8vw,58px);line-height:.95;letter-spacing:-0.03em;text-wrap:balance;
+}
+.overlay h2 em{font-style:normal;color:var(--coral)}
+.overlay p{margin:0;color:var(--lichen);font-size:15px;line-height:1.45;max-width:34ch}
+.overlay .final{font-family:var(--font-mono);font-size:clamp(40px,10vw,64px);font-weight:700;color:var(--bone);line-height:1;font-variant-numeric:tabular-nums}
+.badge{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--gold);color:#2a2100;padding:5px 10px;border-radius:999px;font-weight:700;
+}
+.modes{display:flex;gap:6px;padding:4px;border-radius:12px;background:rgba(0,0,0,.28);flex-wrap:wrap;justify-content:center}
+.modes button{
+  font:600 14px/1 var(--font-display);color:var(--lichen);background:transparent;border:0;border-radius:9px;
+  padding:10px 14px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;min-width:84px;
+}
+.modes button small{font:500 10px/1 var(--font-mono);letter-spacing:.06em;opacity:.8}
+.modes button[aria-pressed="true"]{background:var(--bone);color:var(--soil)}
+.modes button:focus-visible,.btn:focus-visible,.icon-btn:focus-visible,.pad button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.btn{
+  font:700 16px/1 var(--font-display);color:#2b0f05;background:var(--coral);border:0;border-radius:12px;
+  padding:14px 26px;cursor:pointer;box-shadow:0 6px 0 #b9482b;transform:translateY(0);transition:transform .08s, box-shadow .08s;
+}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b9482b}
+.hint{font-family:var(--font-mono);font-size:11px;color:var(--lichen);letter-spacing:.04em}
+kbd{font-family:var(--font-mono);font-size:11px;border:1px solid rgba(147,184,156,.35);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--bone)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;font-size:13px;color:var(--lichen)}
+.legend span{display:flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.bar{
+  width:var(--board);max-width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.icon-btn{
+  font:600 12px/1 var(--font-mono);letter-spacing:.06em;color:var(--lichen);background:rgba(147,184,156,.08);
+  border:1px solid rgba(147,184,156,.18);border-radius:8px;padding:8px 10px;cursor:pointer;
+}
+.icon-btn:hover{color:var(--bone)}
+.pad{display:none;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,52px);gap:8px}
+.pad button{
+  border:0;border-radius:14px;background:rgba(147,184,156,.12);color:var(--bone);font-size:22px;cursor:pointer;
+  touch-action:manipulation;
+}
+.pad button:active{background:var(--coral);color:var(--soil)}
+.pad .up{grid-column:2;grid-row:1}
+.pad .left{grid-column:1;grid-row:2}
+.pad .down{grid-column:2;grid-row:2}
+.pad .right{grid-column:3;grid-row:2}
+@media (pointer:coarse){
+  .pad{display:grid}
+  .kb-only{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .overlay{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="hud">
+    <div class="brand">
+      <h1>Garden <span>Viper</span></h1>
+      <div class="mode-tag" id="modeTag">Classic · walls bite</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="len">3</b><small>Length</small></div>
+      <div class="stat"><b id="score">0</b><small>Score</small></div>
+      <div class="stat best"><b id="best">0</b><small>Best</small></div>
+    </div>
+  </header>
+  <div class="combo" aria-hidden="true"><i id="comboBar"></i></div>
+
+  <div class="stage" id="stage">
+    <canvas id="board" aria-label="Snake game board"></canvas>
+
+    <div class="overlay" id="startOverlay">
+      <h2>Eat. Grow.<br><em>Don't bite.</em></h2>
+      <div class="modes" role="group" aria-label="Game mode">
+        <button type="button" data-mode="classic" id="mode-classic">Classic<small>walls bite</small></button>
+        <button type="button" data-mode="portal" id="mode-portal">Portal<small>edges wrap</small></button>
+        <button type="button" data-mode="maze" id="mode-maze">Maze<small>stones + walls</small></button>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--berry)"></i>Apple +10</span>
+        <span><i class="dot" style="background:var(--gold)"></i>Golden +50, fades</span>
+        <span>Eat fast for ×5 combo</span>
+      </div>
+      <button class="btn" id="playBtn" type="button">Play</button>
+      <div class="hint kb-only"><kbd>←↑↓→</kbd> or <kbd>WASD</kbd> · <kbd>Space</kbd> pause · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> mode</div>
+      <div class="hint" style="display:none" id="touchHint">Swipe the board or use the pad</div>
+    </div>
+
+    <div class="overlay" id="pauseOverlay" hidden>
+      <h2>Paused</h2>
+      <p>The garden waits for you.</p>
+      <button class="btn" id="resumeBtn" type="button">Resume</button>
+      <div class="hint kb-only"><kbd>Space</kbd> to resume</div>
+    </div>
+
+    <div class="overlay" id="overOverlay" hidden>
+      <div id="newBest" class="badge" hidden>New best</div>
+      <h2 id="deathTitle">Bit your <em>own tail</em></h2>
+      <div class="final" id="finalScore">0</div>
+      <p id="deathStats">Length 3 · best combo ×1</p>
+      <div class="modes" role="group" aria-label="Game mode">
+        <button type="button" data-mode="classic" id="mode2-classic">Classic<small>walls bite</small></button>
+        <button type="button" data-mode="portal" id="mode2-portal">Portal<small>edges wrap</small></button>
+        <button type="button" data-mode="maze" id="mode2-maze">Maze<small>stones + walls</small></button>
+      </div>
+      <button class="btn" id="againBtn" type="button">Play again</button>
+      <div class="hint kb-only"><kbd>Space</kbd> to restart</div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <button class="icon-btn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
+    <span class="hint" id="speedLabel">Speed 1</span>
+    <button class="icon-btn" id="pauseBtn" type="button">Pause</button>
+  </div>
+
+  <div class="pad" aria-label="Direction pad">
+    <button class="up" type="button" data-dir="up" aria-label="Up">▲</button>
+    <button class="left" type="button" data-dir="left" aria-label="Left">◀</button>
+    <button class="down" type="button" data-dir="down" aria-label="Down">▼</button>
+    <button class="right" type="button" data-dir="right" aria-label="Right">▶</button>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+const COLS = 20, ROWS = 20;
+const COMBO_WINDOW = 3200;
+const GOLD_LIFE = 6500;
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const css = getComputedStyle(document.documentElement);
+const C = {
+  moss: css.getPropertyValue("--moss").trim(),
+  moss2: css.getPropertyValue("--moss-2").trim(),
+  stone: css.getPropertyValue("--stone").trim(),
+  coral: css.getPropertyValue("--coral").trim(),
+  amber: css.getPropertyValue("--amber").trim(),
+  berry: css.getPropertyValue("--berry").trim(),
+  gold: css.getPropertyValue("--gold").trim(),
+  bone: css.getPropertyValue("--bone").trim(),
+};
+const MODES = {
+  classic: { label: "Classic · walls bite", wrap: false, maze: false },
+  portal:  { label: "Portal · edges wrap",  wrap: true,  maze: false },
+  maze:    { label: "Maze · stones + walls", wrap: false, maze: true },
+};
+const DIRS = {
+  up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 },
+};
+const KEYMAP = {
+  arrowup: "up", w: "up", arrowdown: "down", s: "down", arrowleft: "left", a: "left", arrowright: "right", d: "right",
+};
+
+/* ---------- storage (best effort) ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+
+/* ---------- DOM ---------- */
+const $ = (id) => document.getElementById(id);
+const canvas = $("board"), ctx = canvas.getContext("2d");
+const stage = $("stage");
+const ui = {
+  score: $("score"), best: $("best"), len: $("len"), modeTag: $("modeTag"), comboBar: $("comboBar"),
+  start: $("startOverlay"), pause: $("pauseOverlay"), over: $("overOverlay"),
+  final: $("finalScore"), deathTitle: $("deathTitle"), deathStats: $("deathStats"), newBest: $("newBest"),
+  sound: $("soundBtn"), pauseBtn: $("pauseBtn"), speed: $("speedLabel"),
+};
+if (matchMedia("(pointer:coarse)").matches) $("touchHint").style.display = "";
+
+/* ---------- audio ---------- */
+let actx = null;
+let soundOn = store.get("gv.sound", "1") === "1";
+function audio() {
+  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch { actx = null; } }
+  if (actx && actx.state === "suspended") actx.resume();
+  return actx;
+}
+function tone(freq, dur, { type = "square", vol = 0.06, to = null, delay = 0 } = {}) {
+  if (!soundOn) return;
+  const a = audio(); if (!a) return;
+  const t0 = a.currentTime + delay;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t0);
+  if (to) o.frequency.exponentialRampToValueAtTime(to, t0 + dur);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g).connect(a.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+}
+const sfx = {
+  eat(combo) { const f = 440 * Math.pow(2, (combo - 1) * 2 / 12); tone(f, 0.09, { type: "square", to: f * 1.5 }); },
+  gold() { [0, 4, 7, 12].forEach((s, i) => tone(660 * Math.pow(2, s / 12), 0.12, { type: "triangle", vol: 0.07, delay: i * 0.06 })); },
+  turn() { tone(220, 0.03, { type: "sine", vol: 0.02 }); },
+  die() { tone(300, 0.5, { type: "sawtooth", vol: 0.07, to: 50 }); tone(90, 0.35, { type: "square", vol: 0.05, to: 40, delay: 0.05 }); },
+  start() { tone(392, 0.08, { type: "triangle" }); tone(587, 0.12, { type: "triangle", delay: 0.08 }); },
+};
+function renderSound() { ui.sound.textContent = soundOn ? "Sound on" : "Sound off"; ui.sound.setAttribute("aria-pressed", String(soundOn)); }
+ui.sound.addEventListener("click", () => { soundOn = !soundOn; store.set("gv.sound", soundOn ? "1" : "0"); renderSound(); if (soundOn) tone(523, 0.08); });
+renderSound();
+
+/* ---------- state ---------- */
+let mode = store.get("gv.mode", "classic"); if (!MODES[mode]) mode = "classic";
+let state = "ready"; // ready | playing | paused | dead
+let snake, prev, dir, queue, food, gold, score, apples, combo, bestCombo, lastEat, interval, pendingGrow;
+let obstacles = new Set();
+let particles = [], popups = [];
+let gameTime = 0, acc = 0, deadAt = 0, deathCause = "";
+let cell = 20, size = 400, dpr = 1;
+const key = (x, y) => x + "," + y;
+
+function buildObstacles() {
+  obstacles = new Set();
+  if (!MODES[mode].maze) return;
+  const add = (x, y) => obstacles.add(key(x, y));
+  for (const y of [4, 15]) { for (let x = 3; x <= 7; x++) add(x, y); for (let x = 12; x <= 16; x++) add(x, y); }
+  for (const y of [7, 8, 11, 12]) { add(9, y); add(10, y); }
+  for (const x of [3, 16]) { add(x, 5); add(x, 14); }
+}
+function bestFor(m) { return parseInt(store.get("gv.best." + m, "0"), 10) || 0; }
+
+function reset() {
+  buildObstacles();
+  snake = [{ x: 6, y: 10 }, { x: 5, y: 10 }, { x: 4, y: 10 }];
+  prev = snake.map((s) => ({ ...s }));
+  dir = DIRS.right; queue = [];
+  score = 0; apples = 0; combo = 0; bestCombo = 1; lastEat = -1e9; interval = 135; pendingGrow = 0;
+  gold = null; particles = []; popups = []; gameTime = 0; acc = 0;
+  food = spawn();
+  updateHud();
+}
+function occupied(x, y) {
+  if (obstacles.has(key(x, y))) return true;
+  if (snake.some((s) => s.x === x && s.y === y)) return true;
+  if (food && food.x === x && food.y === y) return true;
+  if (gold && gold.x === x && gold.y === y) return true;
+  return false;
+}
+function spawn() {
+  const free = [];
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (!occupied(x, y)) free.push({ x, y });
+  return free.length ? free[(Math.random() * free.length) | 0] : null;
+}
+
+/* ---------- HUD & overlays ---------- */
+function updateHud() {
+  ui.score.textContent = score;
+  ui.best.textContent = Math.max(bestFor(mode), score);
+  ui.len.textContent = snake.length;
+  ui.modeTag.textContent = MODES[mode].label;
+  ui.speed.textContent = "Speed " + (1 + Math.round((135 - interval) / 10));
+  document.querySelectorAll(".modes button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+}
+function show(which) {
+  ui.start.hidden = which !== "start";
+  ui.pause.hidden = which !== "pause";
+  ui.over.hidden = which !== "over";
+  ui.pauseBtn.textContent = state === "paused" ? "Resume" : "Pause";
+}
+function setMode(m) {
+  if (!MODES[m] || state === "playing" || state === "paused") return;
+  mode = m; store.set("gv.mode", m);
+  reset();
+}
+
+function startGame() {
+  audio();
+  reset(); state = "playing"; show(null); sfx.start();
+  if (typeof gtag === "function") gtag("event", "game_start", { event_category: "garden_viper", event_label: mode });
+}
+function pauseToggle() {
+  if (state === "playing") { state = "paused"; show("pause"); }
+  else if (state === "paused") { state = "playing"; show(null); }
+}
+function die(cause) {
+  state = "dead"; deadAt = performance.now(); deathCause = cause;
+  if (typeof gtag === "function") gtag("event", "game_over", { event_category: "garden_viper", event_label: mode + "_" + cause, value: score });
+  sfx.die();
+  if (navigator.vibrate) { try { navigator.vibrate(120); } catch {} }
+  const prevBest = bestFor(mode);
+  const isBest = score > prevBest;
+  if (isBest) store.set("gv.best." + mode, String(score));
+  const titles = {
+    wall: "Hit the <em>garden wall</em>",
+    stone: "Cracked on a <em>stone</em>",
+    self: "Bit your <em>own tail</em>",
+    full: "You filled the <em>whole garden</em>",
+  };
+  ui.deathTitle.innerHTML = titles[cause] || titles.self;
+  ui.final.textContent = score;
+  ui.deathStats.textContent = `Length ${snake.length} · ${apples} eaten · best combo ×${bestCombo}`;
+  ui.newBest.hidden = !isBest || score === 0;
+  for (let i = 0; i < (reduceMotion ? 0 : 26); i++) burst(snake[0].x + 0.5, snake[0].y + 0.5, C.coral, 1);
+  setTimeout(() => { if (state === "dead") { show("over"); updateHud(); } }, 650);
+}
+
+/* ---------- input ---------- */
+function queueDir(name) {
+  const d = DIRS[name]; if (!d) return;
+  if (state === "ready" || state === "dead") {
+    if (state === "dead" && performance.now() - deadAt < 650) return;
+    startGame();
+  }
+  if (state !== "playing") return;
+  const last = queue.length ? queue[queue.length - 1] : dir;
+  if ((d.x === -last.x && d.y === -last.y) || (d.x === last.x && d.y === last.y)) return;
+  if (queue.length < 3) queue.push(d);
+}
+document.addEventListener("keydown", (e) => {
+  const k = e.key.toLowerCase();
+  if (KEYMAP[k]) { e.preventDefault(); queueDir(KEYMAP[k]); return; }
+  if (k === " " || k === "enter") {
+    if (document.activeElement && document.activeElement.tagName === "BUTTON" && k === "enter") return;
+    e.preventDefault();
+    if (state === "ready") startGame();
+    else if (state === "dead") { if (performance.now() - deadAt > 650) startGame(); }
+    else pauseToggle();
+  } else if (k === "p" || k === "escape") pauseToggle();
+  else if (k === "m") ui.sound.click();
+  else if (k === "1") setMode("classic");
+  else if (k === "2") setMode("portal");
+  else if (k === "3") setMode("maze");
+});
+$("playBtn").addEventListener("click", startGame);
+$("againBtn").addEventListener("click", startGame);
+$("resumeBtn").addEventListener("click", pauseToggle);
+ui.pauseBtn.addEventListener("click", () => { if (state === "ready" || state === "dead") startGame(); else pauseToggle(); });
+document.querySelectorAll(".modes button").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+document.querySelectorAll(".pad button").forEach((b) =>
+  b.addEventListener("pointerdown", (e) => { e.preventDefault(); queueDir(b.dataset.dir); }));
+
+let touchStart = null;
+stage.addEventListener("pointerdown", (e) => {
+  if (e.target.closest("button")) return;
+  touchStart = { x: e.clientX, y: e.clientY };
+});
+stage.addEventListener("pointermove", (e) => {
+  if (!touchStart) return;
+  const dx = e.clientX - touchStart.x, dy = e.clientY - touchStart.y;
+  if (Math.hypot(dx, dy) < 22) return;
+  queueDir(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up"));
+  touchStart = { x: e.clientX, y: e.clientY };
+});
+const endTouch = () => { touchStart = null; };
+stage.addEventListener("pointerup", endTouch);
+stage.addEventListener("pointercancel", endTouch);
+document.addEventListener("visibilitychange", () => { if (document.hidden && state === "playing") pauseToggle(); });
+window.addEventListener("blur", () => { if (state === "playing") pauseToggle(); });
+
+/* ---------- simulation ---------- */
+function tick() {
+  if (queue.length) dir = queue.shift();
+  const head = snake[0];
+  let nx = head.x + dir.x, ny = head.y + dir.y;
+  if (MODES[mode].wrap) { nx = (nx + COLS) % COLS; ny = (ny + ROWS) % ROWS; }
+  else if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) { prev = snake.map((s) => ({ ...s })); return die("wall"); }
+  if (obstacles.has(key(nx, ny))) { prev = snake.map((s) => ({ ...s })); return die("stone"); }
+
+  const eatApple = food && food.x === nx && food.y === ny;
+  const eatGold = gold && gold.x === nx && gold.y === ny;
+  const tailStays = pendingGrow > 0 || eatApple || eatGold;
+  const body = tailStays ? snake : snake.slice(0, -1);
+  if (body.some((s) => s.x === nx && s.y === ny)) { prev = snake.map((s) => ({ ...s })); return die("self"); }
+
+  const old = snake;
+  snake = [{ x: nx, y: ny }, ...old];
+  if (eatApple || eatGold) eat(eatGold, nx, ny);
+  if (pendingGrow > 0) pendingGrow--; else snake.pop();
+  prev = snake.map((_, i) => old[i] || old[old.length - 1]);
+
+  if (eatApple) {
+    food = spawn();
+    if (!food) return die("full");
+    if (!gold && apples > 2 && Math.random() < 0.22) { const g = spawn(); if (g) gold = { ...g, born: gameTime }; }
+  }
+  if (eatGold) gold = null;
+  updateHud();
+}
+function eat(isGold, x, y) {
+  combo = gameTime - lastEat < COMBO_WINDOW ? Math.min(combo + 1, 5) : 1;
+  bestCombo = Math.max(bestCombo, combo);
+  lastEat = gameTime;
+  const pts = (isGold ? 50 : 10) * combo;
+  score += pts;
+  pendingGrow += isGold ? 3 : 1;
+  if (!isGold) { apples++; interval = Math.max(62, 135 - apples * 2.4); }
+  popups.push({ x: x + 0.5, y: y + 0.2, text: "+" + pts + (combo > 1 ? "  ×" + combo : ""), life: 0, gold: isGold });
+  const n = reduceMotion ? 4 : 16;
+  for (let i = 0; i < n; i++) burst(x + 0.5, y + 0.5, isGold ? C.gold : C.berry, 0.7);
+  isGold ? sfx.gold() : sfx.eat(combo);
+}
+function burst(x, y, color, power) {
+  const a = Math.random() * Math.PI * 2, s = (2 + Math.random() * 5) * power;
+  particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0, max: 0.45 + Math.random() * 0.4, color, r: 0.06 + Math.random() * 0.08 });
+}
+
+/* ---------- rendering ---------- */
+function resize() {
+  const hud = 150, pad = matchMedia("(pointer:coarse)").matches ? 130 : 0;
+  const avail = Math.min(window.innerWidth - 32, window.innerHeight - hud - pad, 640);
+  size = Math.max(200, Math.floor(avail / COLS) * COLS);
+  cell = size / COLS;
+  document.documentElement.style.setProperty("--board", size + "px");
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = size * dpr; canvas.height = size * dpr;
+}
+window.addEventListener("resize", resize);
+
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function drawBoard() {
+  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+    ctx.fillStyle = (x + y) % 2 ? C.moss : C.moss2;
+    ctx.fillRect(x * cell, y * cell, cell, cell);
+  }
+  const g = ctx.createRadialGradient(size / 2, size / 2, size * 0.2, size / 2, size / 2, size * 0.75);
+  g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,0.35)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, size, size);
+
+  if (MODES[mode].wrap) {
+    const t = performance.now() / 1000;
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,195,94,0.55)"; ctx.lineWidth = 3; ctx.setLineDash([cell * 0.4, cell * 0.4]);
+    ctx.lineDashOffset = -t * cell; ctx.strokeRect(1.5, 1.5, size - 3, size - 3);
+    ctx.restore();
+  } else {
+    ctx.strokeStyle = "rgba(240,234,214,0.16)"; ctx.lineWidth = 4; ctx.strokeRect(2, 2, size - 4, size - 4);
+  }
+  for (const k of obstacles) {
+    const [x, y] = k.split(",").map(Number);
+    const p = cell * 0.08;
+    ctx.fillStyle = "rgba(0,0,0,0.35)";
+    roundRect(x * cell + p, y * cell + p + cell * 0.08, cell - 2 * p, cell - 2 * p, cell * 0.22); ctx.fill();
+    ctx.fillStyle = C.stone;
+    roundRect(x * cell + p, y * cell + p, cell - 2 * p, cell - 2 * p, cell * 0.22); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.08)";
+    roundRect(x * cell + p * 2, y * cell + p * 1.6, cell - 4 * p, cell * 0.25, cell * 0.12); ctx.fill();
+  }
+}
+function drawApple(f, t) {
+  const cx = (f.x + 0.5) * cell, cy = (f.y + 0.5) * cell + Math.sin(t * 3) * cell * 0.05;
+  const r = cell * 0.33;
+  ctx.fillStyle = "rgba(232,67,74,0.18)";
+  ctx.beginPath(); ctx.arc(cx, cy, r * 1.9, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "rgba(0,0,0,0.3)";
+  ctx.beginPath(); ctx.ellipse(cx, (f.y + 0.88) * cell, r * 0.8, r * 0.25, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = C.berry;
+  ctx.beginPath(); ctx.arc(cx - r * 0.35, cy, r * 0.8, 0, Math.PI * 2); ctx.arc(cx + r * 0.35, cy, r * 0.8, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "rgba(255,255,255,0.35)";
+  ctx.beginPath(); ctx.ellipse(cx - r * 0.45, cy - r * 0.3, r * 0.22, r * 0.14, -0.6, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = "#5a3a1c"; ctx.lineWidth = cell * 0.06; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.moveTo(cx, cy - r * 0.6); ctx.lineTo(cx + r * 0.1, cy - r * 1.05); ctx.stroke();
+  ctx.fillStyle = "#6fcf7a";
+  ctx.beginPath(); ctx.ellipse(cx + r * 0.42, cy - r * 0.95, r * 0.34, r * 0.16, -0.5, 0, Math.PI * 2); ctx.fill();
+}
+function drawGold(g, t) {
+  const age = gameTime - g.born, left = 1 - age / GOLD_LIFE;
+  if (left < 0.25 && Math.floor(t * 8) % 2) return;
+  const cx = (g.x + 0.5) * cell, cy = (g.y + 0.5) * cell, r = cell * 0.36;
+  ctx.fillStyle = "rgba(255,216,74,0.22)";
+  ctx.beginPath(); ctx.arc(cx, cy, r * (1.8 + Math.sin(t * 6) * 0.15), 0, Math.PI * 2); ctx.fill();
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(t * 1.2);
+  ctx.fillStyle = C.gold; ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2 - Math.PI / 2, rr = i % 2 ? r * 0.45 : r;
+    ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+  }
+  ctx.closePath(); ctx.fill(); ctx.restore();
+  ctx.strokeStyle = "rgba(255,216,74,0.85)"; ctx.lineWidth = cell * 0.07; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.arc(cx, cy, r * 1.35, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.max(0, left)); ctx.stroke();
+}
+function lerpColor(a, b, t) {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const r = ((pa >> 16) & 255) + (((pb >> 16) & 255) - ((pa >> 16) & 255)) * t;
+  const g = ((pa >> 8) & 255) + (((pb >> 8) & 255) - ((pa >> 8) & 255)) * t;
+  const bl = (pa & 255) + ((pb & 255) - (pa & 255)) * t;
+  return `rgb(${r | 0},${g | 0},${bl | 0})`;
+}
+function snakePoints(t) {
+  return snake.map((s, i) => {
+    const p = prev[i] || s;
+    let dx = s.x - p.x, dy = s.y - p.y;
+    if (dx > 1) dx -= COLS; if (dx < -1) dx += COLS;
+    if (dy > 1) dy -= ROWS; if (dy < -1) dy += ROWS;
+    return { x: p.x + dx * t + 0.5, y: p.y + dy * t + 0.5 };
+  });
+}
+function drawSnake(pts, t, now, ox, oy) {
+  const n = pts.length;
+  const dead = state === "dead";
+  const width = (i) => cell * (0.78 - 0.34 * (i / Math.max(1, n - 1)));
+  const seg = (i, pass) => {
+    const a = pts[i], b = pts[i - 1];
+    if (Math.abs(a.x - b.x) > 1.5 || Math.abs(a.y - b.y) > 1.5) return;
+    ctx.beginPath();
+    ctx.moveTo((a.x + ox) * cell, (a.y + oy) * cell);
+    ctx.lineTo((b.x + ox) * cell, (b.y + oy) * cell);
+    if (pass === 0) { ctx.strokeStyle = "rgba(0,0,0,0.3)"; ctx.lineWidth = width(i) + cell * 0.04; ctx.stroke(); }
+    else if (pass === 1) {
+      const k = i / Math.max(1, n - 1);
+      let col = lerpColor(C.coral, "#c8452a", k);
+      if (Math.floor((i + 0.5) / 2) % 2 === 1) col = lerpColor(C.amber, "#e0743a", k);
+      if (dead && Math.floor(now / 110) % 2) col = "#f0ead6";
+      ctx.strokeStyle = col; ctx.lineWidth = width(i); ctx.stroke();
+    } else {
+      ctx.strokeStyle = "rgba(255,255,255,0.16)"; ctx.lineWidth = width(i) * 0.28; ctx.stroke();
+    }
+  };
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.save(); ctx.translate(0, cell * 0.1);
+  for (let i = n - 1; i >= 1; i--) seg(i, 0);
+  ctx.restore();
+  for (let i = n - 1; i >= 1; i--) seg(i, 1);
+  ctx.save(); ctx.translate(-cell * 0.06, -cell * 0.08);
+  for (let i = n - 1; i >= 1; i--) seg(i, 2);
+  ctx.restore();
+
+  // head
+  const h = pts[0], hx = (h.x + ox) * cell, hy = (h.y + oy) * cell;
+  const fx = dir.x, fy = dir.y, px = -fy, py = fx;
+  // tongue
+  const flick = (now % 1800) < 260 && !dead;
+  if (flick) {
+    const L = cell * 0.62, tx = hx + fx * L, ty = hy + fy * L;
+    ctx.strokeStyle = "#ff3d5a"; ctx.lineWidth = cell * 0.06;
+    ctx.beginPath(); ctx.moveTo(hx + fx * cell * 0.3, hy + fy * cell * 0.3); ctx.lineTo(tx, ty);
+    ctx.lineTo(tx + (fx + px) * cell * 0.12, ty + (fy + py) * cell * 0.12);
+    ctx.moveTo(tx, ty); ctx.lineTo(tx + (fx - px) * cell * 0.12, ty + (fy - py) * cell * 0.12); ctx.stroke();
+  }
+  ctx.fillStyle = dead && Math.floor(now / 110) % 2 ? "#f0ead6" : C.coral;
+  ctx.beginPath(); ctx.ellipse(hx + fx * cell * 0.06, hy + fy * cell * 0.06, cell * 0.46, cell * 0.46, 0, 0, Math.PI * 2); ctx.fill();
+  // eyes
+  const target = gold || food;
+  let lx = 0, ly = 0;
+  if (target) { const vx = target.x + 0.5 - h.x, vy = target.y + 0.5 - h.y, m = Math.hypot(vx, vy) || 1; lx = vx / m; ly = vy / m; }
+  for (const s of [-1, 1]) {
+    const ex = hx + fx * cell * 0.12 + px * s * cell * 0.2, ey = hy + fy * cell * 0.12 + py * s * cell * 0.2;
+    ctx.fillStyle = "#fffaf0";
+    ctx.beginPath(); ctx.arc(ex, ey, cell * 0.14, 0, Math.PI * 2); ctx.fill();
+    if (dead) {
+      ctx.strokeStyle = "#1a0f0a"; ctx.lineWidth = cell * 0.05; const q = cell * 0.07;
+      ctx.beginPath(); ctx.moveTo(ex - q, ey - q); ctx.lineTo(ex + q, ey + q); ctx.moveTo(ex + q, ey - q); ctx.lineTo(ex - q, ey + q); ctx.stroke();
+    } else {
+      ctx.fillStyle = "#1a0f0a";
+      ctx.beginPath(); ctx.arc(ex + lx * cell * 0.05, ey + ly * cell * 0.05, cell * 0.075, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+}
+function drawFx(dt) {
+  for (const p of particles) {
+    p.life += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.9; p.vy *= 0.9;
+    const k = 1 - p.life / p.max; if (k <= 0) continue;
+    ctx.globalAlpha = k; ctx.fillStyle = p.color;
+    ctx.beginPath(); ctx.arc(p.x * cell, p.y * cell, p.r * cell * (0.5 + k), 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  particles = particles.filter((p) => p.life < p.max);
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  for (const p of popups) {
+    p.life += dt; const k = 1 - p.life / 0.9; if (k <= 0) continue;
+    ctx.globalAlpha = Math.min(1, k * 1.6);
+    ctx.font = `700 ${Math.round(cell * (p.gold ? 0.7 : 0.55))}px "JetBrains Mono", monospace`;
+    ctx.fillStyle = "rgba(0,0,0,0.45)"; ctx.fillText(p.text, p.x * cell + 1, (p.y - p.life * 1.1) * cell + 2);
+    ctx.fillStyle = p.gold ? C.gold : C.bone; ctx.fillText(p.text, p.x * cell, (p.y - p.life * 1.1) * cell);
+  }
+  ctx.globalAlpha = 1;
+  popups = popups.filter((p) => p.life < 0.9);
+}
+
+function render(t, now, dt) {
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, size, size);
+  let sx = 0, sy = 0;
+  if (state === "dead" && !reduceMotion) {
+    const k = Math.max(0, 1 - (now - deadAt) / 420);
+    sx = (Math.random() - 0.5) * 12 * k; sy = (Math.random() - 0.5) * 12 * k;
+  }
+  ctx.save(); ctx.translate(sx, sy);
+  ctx.save(); roundRect(0, 0, size, size, 14); ctx.clip();
+  drawBoard();
+  const ts = now / 1000;
+  if (food) drawApple(food, ts);
+  if (gold) drawGold(gold, ts);
+  const pts = snakePoints(t);
+  if (MODES[mode].wrap) {
+    for (const ox of [-COLS, 0, COLS]) for (const oy of [-ROWS, 0, ROWS]) {
+      const visible = pts.some((p) => p.x + ox > -1 && p.x + ox < COLS + 1 && p.y + oy > -1 && p.y + oy < ROWS + 1);
+      if (visible) drawSnake(pts, t, now, ox, oy);
+    }
+  } else drawSnake(pts, t, now, 0, 0);
+  drawFx(dt);
+  ctx.restore(); ctx.restore();
+}
+
+/* ---------- loop ---------- */
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (state === "playing") {
+    gameTime += dt * 1000;
+    acc += dt * 1000;
+    while (acc >= interval && state === "playing") { acc -= interval; tick(); }
+    if (gold && gameTime - gold.born > GOLD_LIFE) gold = null;
+    const comboLeft = Math.max(0, 1 - (gameTime - lastEat) / COMBO_WINDOW);
+    ui.comboBar.style.width = (comboLeft * 100) + "%";
+    if (comboLeft === 0 && combo) combo = 0;
+  } else if (state !== "paused") ui.comboBar.style.width = "0%";
+  const t = state === "playing" ? Math.min(1, acc / interval) : 1;
+  render(t, now, state === "paused" ? 0 : dt);
+  requestAnimationFrame(frame);
+}
+
+resize(); reset(); show("start");
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
