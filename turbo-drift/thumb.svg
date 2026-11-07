@@ -1,0 +1,45 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a1150"/>
+      <stop offset=".55" stop-color="#c2386b"/>
+      <stop offset="1" stop-color="#ff9a6b"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fff6cf"/>
+      <stop offset=".45" stop-color="#ffb21e"/>
+      <stop offset="1" stop-color="#ff5a36" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff6cf"/>
+      <stop offset=".5" stop-color="#ffb21e"/>
+      <stop offset="1" stop-color="#ff5a36"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#sky)"/>
+  <circle cx="290" cy="120" r="70" fill="url(#sun)"/>
+  <path d="M0 150 L40 118 L80 136 L130 100 L175 130 L220 108 L270 132 L320 96 L360 124 L400 110 L400 160 L0 160 Z" fill="#5b2f7a"/>
+  <rect y="156" width="400" height="144" fill="#5f9a3a"/>
+  <!-- road -->
+  <path d="M170 156 L230 156 L380 300 L20 300 Z" fill="#3b3946"/>
+  <path d="M170 156 L176 156 L40 300 L20 300 Z" fill="#e8263b"/>
+  <path d="M224 156 L230 156 L380 300 L360 300 Z" fill="#e8263b"/>
+  <g fill="#ffd34a"><path d="M199 170 h3 l2 14 h-7z"/><path d="M197 200 h7 l3 24 h-13z"/><path d="M194 245 h13 l4 40 h-21z"/></g>
+  <!-- skid marks + smoke -->
+  <path d="M130 300 C150 270 160 255 168 240 M170 300 C185 272 190 258 196 244" stroke="#0d0b10" stroke-width="6" opacity=".55" fill="none"/>
+  <g fill="#f2eaf7" opacity=".55"><circle cx="120" cy="262" r="22"/><circle cx="96" cy="276" r="26"/><circle cx="146" cy="282" r="18"/></g>
+  <!-- car -->
+  <g transform="translate(205 236) rotate(-12)">
+    <ellipse cx="0" cy="20" rx="66" ry="12" fill="#ff2d3d" opacity=".35"/>
+    <rect x="-58" y="-6" width="116" height="26" rx="4" fill="#d81f2e"/>
+    <rect x="-40" y="-28" width="80" height="24" rx="4" fill="#141d33"/>
+    <rect x="-36" y="-32" width="72" height="6" rx="2" fill="#ff2d3d"/>
+    <rect x="-62" y="-36" width="124" height="6" rx="2" fill="#ff2d3d"/>
+    <rect x="-6" y="-6" width="12" height="26" fill="#fff"/>
+    <rect x="-50" y="2" width="20" height="6" fill="#ff1a1a"/><rect x="30" y="2" width="20" height="6" fill="#ff1a1a"/>
+    <rect x="-62" y="12" width="20" height="16" rx="4" fill="#16141a"/><rect x="42" y="12" width="20" height="16" rx="4" fill="#16141a"/>
+    <path d="M-20 22 L-34 44 L-14 26 Z M20 22 L34 44 L14 26 Z" fill="#3fe0ff"/>
+    <path d="M-20 22 L-28 36 L-16 25 Z M20 22 L28 36 L16 25 Z" fill="#fff"/>
+  </g>
+  <text x="200" y="64" text-anchor="middle" font-family="Arial Black, Impact, sans-serif" font-style="italic" font-size="48" font-weight="900" fill="url(#title)" stroke="#12091f" stroke-width="5" paint-order="stroke">TURBO DRIFT</text>
+</svg>

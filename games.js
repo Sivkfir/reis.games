@@ -50,7 +50,7 @@ const GAMES = [
       description: 'Survive waves of zombies in a dark forest. Loot chests, find the Rei Sword, and defeat the Boss. Free browser game by REI Games Studio.',
       canonical:   'https://reis.games/zombie-slayer/',
     },
-    related: ['turbo-pixel', 'dungeon-rei'],
+    related: ['turbo-drift', 'dungeon-rei'],
   },
 
   {
@@ -127,7 +127,7 @@ const GAMES = [
       description: 'Collect gems before they vanish. Keep your combo alive. 60 seconds of pure flow. Free browser game by REI Games Studio.',
       canonical:   'https://reis.games/gem-rush/',
     },
-    related: ['zombie-slayer', 'turbo-pixel'],
+    related: ['zombie-slayer', 'turbo-drift'],
   },
 
   {
@@ -169,32 +169,41 @@ const GAMES = [
   },
 
   {
-    id: 'turbo-pixel',
-    title: 'Turbo Pixel',
-    slug: 'turbo-pixel',
-    tagline: 'Coming Soon',
-    descEn: 'Pixel-art racing across eight tracks with turbo upgrades.',
-    descHe: 'מירוץ פיקסל-ארט בשמונה מסלולים שונים עם שדרוגי טורבו.',
-    description: 'A high-speed pixel racing game.',
-    longDescription: '',
+    id: 'turbo-drift',
+    title: 'Turbo Drift',
+    slug: 'turbo-drift',
+    tagline: 'Drift. Charge. BOOST.',
+
+    descEn: '3D racing at sunset! Drift through corners to charge your turbo and beat 5 rivals over 3 laps.',
+    descHe: 'מרוץ תלת־ממד בשקיעה! עשו דריפט בפניות כדי לטעון טורבו, ונצחו 5 יריבים ב־3 הקפות.',
+
+    description: 'A 3D arcade drift racer. Drift to charge the turbo, boost past 5 rivals and win the race.',
+    longDescription: 'Turbo Drift is a 3D arcade racing game on the Sunset Circuit. Pick your paint, line up on the grid and race 5 rivals over 3 laps. Hold drift through the corners to charge your turbo from blue to orange to purple, then let go for a massive BOOST. Tire smoke, skid marks, sparks and confetti for the podium.',
+
     emoji: '🏎️',
-    thumbBg: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a08 100%)',
-    thumbnail: '/turbo-pixel/thumb.svg',
+    thumbBg: 'linear-gradient(135deg, #c2386b 0%, #2a1150 100%)',
+    thumbnail: '/turbo-drift/thumb.svg',
     ogImage: 'https://reis.games/logo-white.png',
+
     category: 'racing',
-    difficulty: 'easy',
-    status: 'coming-soon',
-    releaseDate: null,
-    version: null,
-    url: null,
-    controls: { keyboard: [], touch: [] },
-    tags: ['racing', 'pixel'],
-    seo: {
-      title:       'Turbo Pixel — REI Games Studio',
-      description: 'A high-speed pixel racing game. Coming soon to reis.games.',
-      canonical:   'https://reis.games/turbo-pixel/',
+    difficulty: 'medium',
+    status: 'live',
+    releaseDate: '2026-11',
+    version: '0.1',
+
+    url: 'turbo-drift/index.html',
+
+    controls: {
+      keyboard: ['↑ — Gas', '↓ — Brake', '← → — Steer', 'SPACE (hold) — Drift, release to Boost', 'R — Back on track', 'ESC — Pause'],
+      touch:    ['Gas is automatic', '◀ ▶ — Steer', 'DRIFT (hold) — Drift, release to Boost', 'BRAKE — Brake'],
     },
-    related: ['zombie-slayer', 'dungeon-rei'],
+    tags: ['racing', '3d', 'drift', 'cars', 'arcade'],
+    seo: {
+      title:       'Turbo Drift — REI Games Studio',
+      description: 'A 3D drift racing game in your browser. Drift to charge your turbo, beat 5 rivals over 3 laps. Free game by REI Games Studio.',
+      canonical:   'https://reis.games/turbo-drift/',
+    },
+    related: ['rei-arena', 'garden-viper'],
   },
 
   {
@@ -252,7 +261,7 @@ const GAMES = [
       description: 'Retro space shooter. Coming soon to reis.games.',
       canonical:   'https://reis.games/space-pixel/',
     },
-    related: ['zombie-slayer', 'turbo-pixel'],
+    related: ['zombie-slayer', 'turbo-drift'],
   },
 ];
 
