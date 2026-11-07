@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>הפינה של המשפחה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&family=Noto+Sans+Hebrew:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF8EE;--card:#FFFFFF;--ink:#2B2340;--soft:#6E6787;--line:#EADFCB;--accent:#6C4CF1;--accent-bg:#EEE9FF;--good:#1E9E6A;--good-bg:#E2F6EC;--bad:#D64545;--bad-bg:#FCE6E6;--gold:#F2A900;--gold-bg:#FFF2CC}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:'Rubik',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;padding:16px 16px 40px}
+button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none}
+.wrap{max-width:640px;margin:0 auto}
+.screen{display:none}
+.screen.on{display:block;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;min-height:44px}
+.top h1{font-size:22px;font-weight:700}
+.icon-btn{width:44px;height:44px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);font-size:22px;display:flex;align-items:center;justify-content:center}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:20px}
+.who{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:8px}
+.who button{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:26px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:22px;font-weight:500}
+.who button span{font-size:64px;line-height:1}
+.who button:active,.tile:active,.big:active,.item:active{transform:scale(.97)}
+.dots{display:flex;gap:12px;justify-content:center;margin:18px 0}
+.dots i{width:20px;height:20px;border-radius:50%;border:2px solid var(--accent);display:block}
+.dots i.f{background:var(--accent)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pad button{aspect-ratio:1;background:var(--card);border:2px solid var(--line);border-radius:20px;font-size:44px}
+.err{color:var(--bad);text-align:center;min-height:24px;margin-top:10px;font-size:16px}
+.balance{display:flex;align-items:baseline;gap:8px;justify-content:center}
+.balance b{font-size:52px;font-weight:700;color:var(--accent)}
+.balance small{font-size:18px;color:var(--soft)}
+.bar{height:18px;border-radius:9px;background:var(--accent-bg);overflow:hidden;margin:10px 0 6px}
+.bar div{height:100%;background:var(--accent);border-radius:9px;transition:width 1s ease;width:0}
+.muted{color:var(--soft);font-size:15px}
+.sec{font-size:18px;font-weight:500;margin:22px 4px 10px}
+.list{display:grid;gap:10px}
+.item{display:flex;align-items:center;gap:14px;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:14px 16px;text-align:right;width:100%;font-size:19px}
+.item .ic{font-size:36px;width:44px;text-align:center}
+.item .t{flex:1;font-weight:500}
+.item .s{font-size:15px;color:var(--soft);white-space:nowrap}
+.item.done{background:#FBFAF7}
+.pill{font-size:14px;padding:5px 10px;border-radius:999px;white-space:nowrap}
+.pill.wait{background:var(--gold-bg);color:#8A5A00}
+.pill.ok{background:var(--good-bg);color:var(--good)}
+.story{font-family:'Noto Sans Hebrew','Rubik',sans-serif}
+.story.kid p{font-size:clamp(23px,6.4vw,32px);line-height:2;margin-bottom:2px}
+.story.big p{font-size:21px;line-height:1.9}
+.w{border-radius:8px;padding:0 2px;cursor:pointer}
+.w.say{background:var(--gold-bg)}
+.hint{font-size:14px;color:var(--soft);text-align:center;margin-bottom:12px}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.big{background:var(--accent);color:#fff;font-size:22px;font-weight:500;border-radius:18px;padding:16px 30px;min-height:60px}
+.big.alt{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.big.rec{background:var(--bad);color:#fff}
+.rec-box{margin-top:16px;text-align:center}
+.rec-box audio{width:100%;margin:10px 0}
+.qhead{display:flex;justify-content:space-between;align-items:center}
+.prompt{display:flex;justify-content:center;gap:14px;font-size:56px;margin:18px 0 6px}
+.qtext{font-size:22px;font-weight:500;text-align:center;margin:14px 0 6px;line-height:1.5}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.tile{aspect-ratio:1;border-radius:22px;background:var(--card);border:2px solid var(--line);font-size:60px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.opts{display:grid;gap:10px;margin-top:16px}
+.opt{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px;font-size:19px;text-align:right}
+.tile.good,.opt.good{border-color:var(--good);background:var(--good-bg)}
+.tile.bad,.opt.bad{border-color:var(--bad);background:var(--bad-bg)}
+.tile.dim,.opt.dim{opacity:.45}
+.stars{font-size:56px;letter-spacing:6px;text-align:center}
+.stars .off{filter:grayscale(1);opacity:.25}
+.reward{font-size:34px;font-weight:700;text-align:center;margin:10px 0}
+.kidrow{display:flex;justify-content:space-between;align-items:baseline;font-size:20px;font-weight:500}
+.feed{display:grid;gap:8px;margin-top:6px}
+.feed div{font-size:15px;color:var(--soft);display:flex;gap:8px;align-items:baseline}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:14px;font-size:16px;opacity:0;pointer-events:none;transition:opacity .3s;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+.demo{background:var(--gold-bg);color:#8A5A00;text-align:center;border-radius:12px;padding:6px;font-size:14px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="demo" id="demoBanner" hidden>מצב תרגול: שום דבר לא נשלח לטריפי</div>
+
+<section class="screen on" id="sc-who">
+  <div class="top"><h1>מי נכנס?</h1></div>
+  <div class="who">
+    <button data-kid="rei"><span>🐉</span>רעי</button>
+    <button data-kid="yaar"><span>🐙</span>יער</button>
+    <button data-kid="parent"><span>👀</span>הורים</button>
+  </div>
+</section>
+
+<section class="screen" id="sc-code">
+  <div class="top"><button class="icon-btn" data-go="who" aria-label="חזרה">→</button><h1 id="codeTitle"></h1><span style="width:44px"></span></div>
+  <p class="hint" style="font-size:18px">הַקּוֹד הַסּוֹדִי שֶׁלְּךָ: 3 תְּמוּנוֹת</p>
+  <div class="dots" id="codeDots"><i></i><i></i><i></i></div>
+  <div class="pad" id="codePad"></div>
+  <div class="err" id="codeErr"></div>
+</section>
+
+<section class="screen" id="sc-home">
+  <div class="top"><button class="icon-btn" id="logout" aria-label="יציאה">🚪</button><h1 id="hello"></h1><button class="icon-btn" data-go="board" aria-label="לוח המשפחה">🏆</button></div>
+  <div class="card">
+    <div class="balance"><b id="bal">0</b><small>דַּקּוֹת מָסָךְ</small></div>
+    <div class="bar"><div id="balBar"></div></div>
+    <p class="muted" style="text-align:center" id="goalText"></p>
+  </div>
+  <h2 class="sec" id="readTitle">📚 לקריאה</h2>
+  <div class="list" id="readList"></div>
+  <div id="choreWrap" hidden>
+    <h2 class="sec">✅ מטלות</h2>
+    <div class="list" id="choreList"></div>
+  </div>
+</section>
+
+<section class="screen" id="sc-read">
+  <div class="top"><button class="icon-btn" data-go="home" aria-label="חזרה">→</button><h1 id="readHead"></h1><span style="width:44px"></span></div>
+  <div class="card">
+    <p class="hint">👆 נְגִיעָה בְּמִלָּה = הִיא נִשְׁמַעַת</p>
+    <div class="story" id="storyText"></div>
+  </div>
+  <div class="rec-box" id="recBox"></div>
+  <div class="actions">
+    <button class="big" id="doneBtn">סִיַּמְתִּי ✓</button>
+    <button class="big alt" id="backToQ" hidden>חֲזָרָה לַשְּׁאֵלוֹת</button>
+  </div>
+</section>
+
+<section class="screen" id="sc-quiz">
+  <div class="qhead"><span class="muted" id="qCount"></span><button class="icon-btn" id="peekBtn" aria-label="חזרה לסיפור">📖</button></div>
+  <div id="qBody"></div>
+</section>
+
+<section class="screen" id="sc-result">
+  <div class="card" style="text-align:center;margin-top:24px">
+    <div class="stars" id="resStars"></div>
+    <div class="reward" id="resReward"></div>
+    <p class="muted" id="resNote"></p>
+    <div class="actions"><button class="big" data-go="home">יוֹפִי!</button></div>
+  </div>
+</section>
+
+<section class="screen" id="sc-board">
+  <div class="top"><button class="icon-btn" id="boardBack" aria-label="חזרה">→</button><h1>לוח המשפחה</h1><button class="icon-btn" id="boardRefresh" aria-label="רענון">🔄</button></div>
+  <div class="card" id="boardKids"></div>
+  <h2 class="sec">מה קרה לאחרונה</h2>
+  <div class="card"><div class="feed" id="boardFeed"></div></div>
+</section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="content.js"></script>
+<script>
+(() => {
+const LOCAL_API = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get('api');
+const API_BASE = LOCAL_API || 'https://tripi-assistant-production.up.railway.app/family';
+const DEMO = new URLSearchParams(location.search).has('demo');
+const CODE_PICS = ['🐉', '🚀', '⚽', '🍕', '🦖', '🎮'];
+const NAMES = { rei: 'רעי', yaar: 'יער', parent: 'הורים' };
+const ITEMS = { rei: REI_STORIES, yaar: YAAR_PASSAGES };
+
+const $ = id => document.getElementById(id);
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(16).slice(2));
+const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(x => x[1]);
+let toastTimer;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 3200); }
+
+// ---------------- API (real or demo) ----------------
+const demoApi = (() => {
+  const key = 'family_demo_events';
+  const events = () => store.get(key) || [];
+  const save = e => store.set(key, e);
+  const minutesFor = c => REWARDS.readingByCorrect[Math.max(0, Math.min(3, c))];
+  function board() {
+    const ev = events();
+    const kids = {};
+    for (const k of ['rei', 'yaar']) {
+      const mine = ev.filter(e => e.kid === k);
+      const done = {}; const recorded = {};
+      mine.filter(e => e.kind === 'reading').forEach(e => { if (!(e.item_id in done)) done[e.item_id] = e.stars; });
+      mine.filter(e => e.kind === 'recording').forEach(e => recorded[e.item_id] = e.status);
+      kids[k] = { name: NAMES[k], balance: mine.filter(e => e.status === 'approved').reduce((s, e) => s + e.minutes, 0),
+        streak: mine.some(e => e.kind === 'reading') ? 1 : 0, done, recorded,
+        pendingChores: mine.filter(e => e.kind === 'chore' && e.status === 'pending').map(e => e.item_id) };
+    }
+    return { goal: REWARDS.goalMinutes, kids, recent: ev.slice(-12).reverse() };
+  }
+  function add(e) { const ev = events(); ev.push({ id: ev.length + 1, created_at: new Date().toISOString(), ...e }); save(ev); return e; }
+  return {
+    async login(kid) { return { token: 'demo', kid, role: kid === 'parent' ? 'parent' : 'kid' }; },
+    async board() { return board(); },
+    async reading(kid, b) {
+      const first = !(b.storyId in board().kids[kid].done);
+      const minutes = first ? minutesFor(b.correct) : 0;
+      add({ kid, kind: 'reading', item_id: b.storyId, title: b.title, minutes, stars: b.correct, status: 'approved' });
+      return { minutes, repeat: !first };
+    },
+    async chore(kid, b) { const c = CHORES[kid].find(x => x.id === b.choreId); add({ kid, kind: 'chore', item_id: c.id, title: c.title, minutes: c.minutes, status: 'pending' }); return { status: 'pending' }; },
+    async recording(kid, blob, meta) { add({ kid, kind: 'recording', item_id: meta.storyId, title: 'הקראה: ' + meta.title, minutes: REWARDS.recordingBonus, status: 'pending' }); return { status: 'pending' }; },
+  };
+})();
+
+const realApi = {
+  async call(path, opts = {}) {
+    const s = store.get('family_session');
+    const headers = Object.assign({}, opts.headers || {});
+    if (s && s.token) headers.Authorization = 'Bearer ' + s.token;
+    let r;
+    try { r = await fetch(API_BASE + path, Object.assign({}, opts, { headers })); }
+    catch { throw new Error('offline'); }
+    if (r.status === 401) { store.del('family_session'); throw new Error('auth'); }
+    const body = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(body.error || 'server');
+    return body;
+  },
+  json(path, data) { return this.call(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); },
+  login(kid, code) { return this.json('/login', { kid, code }); },
+  board() { return this.call('/board'); },
+  reading(kid, b) { return this.json('/reading', b); },
+  chore(kid, b) { return this.json('/chore', b); },
+  recording(kid, blob, meta) {
+    const q = new URLSearchParams({ storyId: meta.storyId, title: meta.title, clientId: meta.clientId });
+    return this.call('/recording?' + q, { method: 'POST', headers: { 'Content-Type': blob.type || 'audio/webm' }, body: blob });
+  },
+};
+const api = DEMO ? demoApi : realApi;
+if (DEMO) $('demoBanner').hidden = false;
+
+function apiError(e) {
+  if (e.message === 'auth') { toast('צריך להיכנס שוב'); go('who'); return; }
+  if (e.message === 'offline') { toast('אין חיבור כרגע. נסו שוב עוד רגע'); return; }
+  toast('משהו השתבש. נסו שוב');
+}
+
+// ---------------- Navigation ----------------
+let session = store.get('family_session');
+let current = null;   // { kid, item }
+let boardCache = null;
+let fromPeek = false;
+function go(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === 'sc-' + name));
+  window.scrollTo(0, 0);
+  speechStop();
+  if (name === 'home') renderHome();
+  if (name === 'board') renderBoard();
+}
+document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go); });
+
+// ---------------- Login ----------------
+let codeKid = null, code = [];
+document.querySelectorAll('.who button').forEach(b => b.onclick = () => { codeKid = b.dataset.kid; code = []; $('codeTitle').textContent = NAMES[codeKid]; $('codeErr').textContent = ''; drawDots(); go('code'); });
+$('codePad').innerHTML = CODE_PICS.map((p, i) => `<button data-i="${i}" aria-label="תמונה ${i + 1}">${p}</button>`).join('');
+$('codePad').querySelectorAll('button').forEach(b => b.onclick = () => { if (code.length >= 3) return; code.push(b.dataset.i); drawDots(); if (code.length === 3) submitCode(); });
+function drawDots() { $('codeDots').querySelectorAll('i').forEach((d, i) => d.classList.toggle('f', i < code.length)); }
+async function submitCode() {
+  try {
+    const res = await api.login(codeKid, code.join('-'));
+    session = res; store.set('family_session', res);
+    go(res.role === 'parent' ? 'board' : 'home');
+  } catch (e) {
+    $('codeErr').textContent = e.message === 'bad_code' ? 'לֹא נָכוֹן, נַסּוּ שׁוּב' : e.message === 'too_many' ? 'יותר מדי ניסיונות. נסו שוב בעוד כמה דקות' : 'אין חיבור כרגע';
+    setTimeout(() => { code = []; drawDots(); }, 500);
+  }
+}
+$('logout').onclick = () => { store.del('family_session'); session = null; go('who'); };
+
+// ---------------- Home ----------------
+async function loadBoard() { boardCache = await api.board(); return boardCache; }
+async function renderHome() {
+  if (!session || session.role !== 'kid') return go('who');
+  const kid = session.kid;
+  $('hello').textContent = 'שָׁלוֹם ' + NAMES[kid] + '!';
+  $('readTitle').textContent = kid === 'rei' ? '📚 סִפּוּרִים' : '📚 לקריאה';
+  let b;
+  try { b = await loadBoard(); } catch (e) { apiError(e); return; }
+  const me = b.kids[kid];
+  $('bal').textContent = me.balance;
+  const pct = Math.min(100, Math.round(me.balance / b.goal * 100));
+  requestAnimationFrame(() => $('balBar').style.width = pct + '%');
+  $('goalText').textContent = me.balance >= b.goal ? '🎉 הגעת ליעד! תגידו להורים' : `עוד ${b.goal - me.balance} דקות לפרס הגדול` + (me.streak > 1 ? ` · 🔥 ${me.streak} ימים ברצף` : '');
+  $('readList').innerHTML = ITEMS[kid].map(it => {
+    const done = it.id in me.done;
+    const st = done ? '⭐'.repeat(me.done[it.id]) || '✓' : '';
+    return `<button class="item${done ? ' done' : ''}" data-item="${it.id}"><span class="ic">${it.cover}</span><span class="t">${it.title}</span><span class="s">${st}</span></button>`;
+  }).join('');
+  $('readList').querySelectorAll('[data-item]').forEach(x => x.onclick = () => openItem(kid, ITEMS[kid].find(i => i.id === x.dataset.item)));
+  const chores = CHORES[kid] || [];
+  $('choreWrap').hidden = !chores.length;
+  $('choreList').innerHTML = chores.map(c => {
+    const pending = me.pendingChores.includes(c.id);
+    return `<div class="item"><span class="ic">${c.icon}</span><span class="t">${c.title} <span class="muted">+${c.minutes}</span></span>${pending ? '<span class="pill wait">⏳ מחכה לאישור</span>' : `<button class="pill ok" data-chore="${c.id}" style="font-size:16px;padding:8px 14px">עשיתי</button>`}</div>`;
+  }).join('');
+  $('choreList').querySelectorAll('[data-chore]').forEach(btn => btn.onclick = async () => {
+    btn.disabled = true;
+    try { await api.chore(kid, { choreId: btn.dataset.chore, clientId: uid() }); toast('נשלח להורים לאישור 👍'); renderHome(); }
+    catch (e) { btn.disabled = false; apiError(e); }
+  });
+}
+
+// ---------------- Reader + speech ----------------
+let heVoice = null;
+function pickVoice() { try { heVoice = speechSynthesis.getVoices().find(v => /^he/i.test(v.lang)) || null; } catch {} }
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text) {
+  if (!('speechSynthesis' in window)) { toast('במכשיר הזה אין הקראה'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'he-IL'; if (heVoice) u.voice = heVoice; u.rate = 0.8;
+  speechSynthesis.speak(u);
+}
+function speechStop() { try { speechSynthesis.cancel(); } catch {} }
+const wordsHtml = s => s.split(/(\s+)/).map(w => /\S/.test(w) ? `<span class="w">${w}</span>` : w).join('');
+
+function openItem(kid, item) {
+  current = { kid, item };
+  fromPeek = false;
+  $('readHead').textContent = item.title;
+  const t = $('storyText');
+  if (kid === 'rei') { t.className = 'story kid'; t.innerHTML = item.lines.map(l => `<p>${wordsHtml(l)}</p>`).join(''); }
+  else { t.className = 'story big'; t.innerHTML = `<p>${wordsHtml(item.text)}</p>`; }
+  t.querySelectorAll('.w').forEach(w => w.onclick = () => {
+    t.querySelectorAll('.say').forEach(x => x.classList.remove('say'));
+    w.classList.add('say'); speak(w.textContent.replace(/[.,!?"״׳:]/g, ''));
+  });
+  $('doneBtn').hidden = false; $('backToQ').hidden = true;
+  renderRec();
+  go('read');
+}
+
+// ---------------- Recording bonus ----------------
+let recorder = null, chunks = [], recBlob = null, recStream = null;
+function recState() { const b = boardCache && boardCache.kids[current.kid]; return b && b.recorded ? b.recorded[current.item.id] : null; }
+function renderRec(mode) {
+  const box = $('recBox');
+  const st = recState();
+  if (st === 'approved') { box.innerHTML = '<span class="pill ok">🎤 ההקראה אושרה · +' + REWARDS.recordingBonus + '</span>'; return; }
+  if (st === 'pending' || mode === 'sent') { box.innerHTML = '<span class="pill wait">🎤 ההקראה נשלחה · מחכה לאישור</span>'; return; }
+  if (!navigator.mediaDevices || !window.MediaRecorder) { box.innerHTML = ''; return; }
+  if (mode === 'recording') { box.innerHTML = '<button class="big rec" id="recStop">⏹ עָצַרְתִּי</button><p class="muted" style="margin-top:8px">🔴 מַקְלִיט… קְרָא בְּקוֹל</p>'; $('recStop').onclick = stopRec; return; }
+  if (mode === 'review') {
+    box.innerHTML = `<audio controls src="${URL.createObjectURL(recBlob)}"></audio><div class="actions" style="margin-top:4px"><button class="big" id="recSend">שְׁלַח לְאַבָּא וְאִמָּא</button><button class="big alt" id="recAgain">שׁוּב</button></div>`;
+    $('recSend').onclick = sendRec; $('recAgain').onclick = startRec; return;
+  }
+  box.innerHTML = `<button class="big alt" id="recStart">🎤 הַקְרָאָה בְּקוֹל <span class="muted">+${REWARDS.recordingBonus}</span></button>`;
+  $('recStart').onclick = startRec;
+}
+async function startRec() {
+  try { recStream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch { toast('צריך לאשר את המיקרופון'); return; }
+  const type = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t));
+  recorder = new MediaRecorder(recStream, type ? { mimeType: type } : undefined);
+  chunks = [];
+  recorder.ondataavailable = e => e.data.size && chunks.push(e.data);
+  recorder.onstop = () => { recStream.getTracks().forEach(t => t.stop()); recBlob = new Blob(chunks, { type: (recorder.mimeType || 'audio/webm').split(';')[0] }); renderRec('review'); };
+  recorder.start();
+  renderRec('recording');
+}
+function stopRec() { if (recorder && recorder.state !== 'inactive') recorder.stop(); }
+async function sendRec() {
+  if (!recBlob || recBlob.size < 2000) { toast('ההקלטה קצרה מדי, נסו שוב'); return; }
+  if (recBlob.size > 5 * 1024 * 1024) { toast('ההקלטה ארוכה מדי'); return; }
+  $('recSend').disabled = true;
+  try {
+    await api.recording(current.kid, recBlob, { storyId: current.item.id, title: current.item.title, clientId: uid() });
+    if (boardCache) boardCache.kids[current.kid].recorded[current.item.id] = 'pending';
+    renderRec('sent'); toast('נשלח! 🎉');
+  } catch (e) { $('recSend').disabled = false; apiError(e); }
+}
+
+// ---------------- Quiz ----------------
+let quiz = null;
+$('doneBtn').onclick = () => { stopRec(); startQuiz(); };
+$('peekBtn').onclick = () => { fromPeek = true; $('doneBtn').hidden = true; $('backToQ').hidden = false; document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === 'sc-read')); window.scrollTo(0, 0); };
+$('backToQ').onclick = () => { speechStop(); document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === 'sc-quiz')); };
+function startQuiz() { quiz = { i: 0, correct: 0, qs: current.item.questions }; go('quiz'); renderQ(); }
+function renderQ() {
+  const q = quiz.qs[quiz.i];
+  const kid = current.kid;
+  $('qCount').textContent = `${quiz.i + 1} / ${quiz.qs.length}`;
+  const order = shuffle(q.options.map((o, idx) => idx));
+  let html;
+  if (kid === 'rei') {
+    html = `<div class="prompt">${q.prompt.join('')}</div><div style="text-align:center"><button class="icon-btn" id="sayQ" style="margin:0 auto" aria-label="הקראת השאלה">🔊</button></div>
+      <div class="tiles">${order.map(i => `<button class="tile" data-i="${i}">${q.options[i]}</button>`).join('')}</div>`;
+  } else {
+    html = `<div class="qtext">${q.q}</div><div class="opts">${order.map(i => `<button class="opt" data-i="${i}">${q.options[i]}</button>`).join('')}</div>`;
+  }
+  $('qBody').innerHTML = html;
+  if (kid === 'rei') { $('sayQ').onclick = () => speak(q.say); setTimeout(() => speak(q.say), 350); }
+  let locked = false;
+  $('qBody').querySelectorAll('[data-i]').forEach(b => b.onclick = () => {
+    if (locked) return; locked = true;
+    const pick = +b.dataset.i;
+    $('qBody').querySelectorAll('[data-i]').forEach(x => { const i = +x.dataset.i; if (i === q.answer) x.classList.add('good'); else if (x === b) x.classList.add('bad'); else x.classList.add('dim'); });
+    if (pick === q.answer) quiz.correct++;
+    setTimeout(() => { quiz.i++; quiz.i < quiz.qs.length ? renderQ() : finishQuiz(); }, 1300);
+  });
+}
+async function finishQuiz() {
+  const { kid, item } = current;
+  const total = quiz.qs.length;
+  $('resStars').innerHTML = Array.from({ length: total }, (_, i) => `<span class="${i < quiz.correct ? '' : 'off'}">⭐</span>`).join('');
+  $('resReward').textContent = '…';
+  $('resNote').textContent = '';
+  go('result');
+  try {
+    const r = await api.reading(kid, { storyId: item.id, title: item.title, correct: quiz.correct, total, clientId: uid() });
+    if (r.repeat) { $('resReward').textContent = 'כָּל הַכָּבוֹד!'; $('resNote').textContent = 'עַל הַסִּפּוּר הַזֶּה כְּבָר קִבַּלְתָּ פְּרָס'; }
+    else { $('resReward').textContent = `+${r.minutes} דַּקּוֹת מָסָךְ 🎉`; $('resNote').textContent = quiz.correct === total ? 'מושלם!' : 'בפעם הבאה אפשר לחזור לסיפור עם 📖'; }
+  } catch (e) { $('resReward').textContent = 'כָּל הַכָּבוֹד!'; $('resNote').textContent = 'לא הצלחנו לשמור כרגע. נסו שוב מאוחר יותר'; apiError(e); }
+}
+
+// ---------------- Board ----------------
+const KIND_ICON = { reading: '📖', chore: '✅', recording: '🎤', adjust: '🎁' };
+$('boardBack').onclick = () => go(session && session.role === 'kid' ? 'home' : 'who');
+$('boardRefresh').onclick = () => renderBoard();
+async function renderBoard() {
+  if (!session) return go('who');
+  let b;
+  try { b = await loadBoard(); } catch (e) { apiError(e); return; }
+  $('boardKids').innerHTML = ['rei', 'yaar'].map(k => {
+    const m = b.kids[k]; const pct = Math.min(100, Math.round(m.balance / b.goal * 100));
+    return `<div style="margin-bottom:14px"><div class="kidrow"><span>${k === 'rei' ? '🐉' : '🐙'} ${m.name}${m.streak > 1 ? ` <span class="muted">🔥 ${m.streak} ימים</span>` : ''}</span><span>${m.balance}/${b.goal}</span></div><div class="bar"><div style="width:${pct}%"></div></div></div>`;
+  }).join('') + '<p class="muted">היעד: 120 דקות = פרס גדול</p>';
+  $('boardFeed').innerHTML = b.recent.length ? b.recent.map(e => {
+    const who = NAMES[e.kid] || e.kid;
+    const st = e.status === 'pending' ? '<span class="pill wait">⏳ ממתין</span>' : e.status === 'rejected' ? '<span class="pill">✗ לא אושר</span>' : (e.minutes ? `<b style="color:var(--good)">+${e.minutes}</b>` : '');
+    const by = e.decided_by && e.status === 'approved' && e.kind !== 'reading' ? ` · אושר ע״י ${e.decided_by}` : '';
+    const stars = e.kind === 'reading' && e.stars != null ? ' ' + '⭐'.repeat(e.stars) : '';
+    return `<div><span>${KIND_ICON[e.kind] || '•'}</span><span style="flex:1">${who}: ${e.title}${stars}${by}</span>${st}</div>`;
+  }).join('') : '<div>עוד אין כלום. בואו נתחיל לקרוא!</div>';
+}
+
+// ---------------- Start ----------------
+if (session) go(session.role === 'parent' ? 'board' : 'home');
+})();
+</script>
+</body>
+</html>
