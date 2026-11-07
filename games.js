@@ -91,6 +91,44 @@ const GAMES = [
   },
 
   {
+    id: 'rei-arena',
+    title: 'Rei Arena',
+    slug: 'rei-arena',
+    tagline: '3 vs 3 Gem Grab. Pick a hero. Hold the gems.',
+
+    descEn: '3 vs 3 hero battles! Grab 10 gems and hold them for 10 seconds to win.',
+    descHe: 'קרבות גיבורים 3 נגד 3! אספו 10 אבני חן והחזיקו אותן 10 שניות כדי לנצח.',
+
+    description: 'A top-down 3v3 hero arena game. Pick a hero, team up with bots, and battle for gems.',
+    longDescription: 'Rei Arena is a fast team battle game. Choose Spark, Boulder or Frost, each with their own attack and Super. Grab gems from the mine in the middle, hide in bushes, knock out the red team and hold 10 gems for 10 seconds to win. New heroes designed by Rei are coming soon!',
+
+    emoji: '⚔️',
+    thumbBg: 'linear-gradient(135deg, #2b5a2f 0%, #16202b 100%)',
+    thumbnail: '/rei-arena/thumb.svg',
+    ogImage: 'https://reis.games/logo-white.png',
+
+    category: 'action',
+    difficulty: 'medium',
+    status: 'live',
+    releaseDate: '2026-11',
+    version: '0.1',
+
+    url: 'rei-arena/index.html',
+
+    controls: {
+      keyboard: ['WASD — Move', 'Mouse — Aim', 'Click — Shoot', 'SPACE / Right-click — Super', 'ESC — Pause'],
+      touch:    ['Left thumb — Move', 'Right thumb — Aim, release to shoot (tap = auto-aim)', 'Yellow button — Super'],
+    },
+    tags: ['action', 'arena', 'team', 'heroes', 'multiplayer-style'],
+    seo: {
+      title:       'Rei Arena — REI Games Studio',
+      description: '3 vs 3 hero arena battles in your browser. Pick a hero, grab gems and win. Free game by REI Games Studio.',
+      canonical:   'https://reis.games/rei-arena/',
+    },
+    related: ['zombie-slayer', 'gem-rush'],
+  },
+
+  {
     id: 'turbo-pixel',
     title: 'Turbo Pixel',
     slug: 'turbo-pixel',
