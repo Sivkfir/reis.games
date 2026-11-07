@@ -1050,7 +1050,7 @@
     if (!grid || typeof GAMES === 'undefined') return;
     const lang = currentLang;
     const t = translations[lang];
-    grid.innerHTML = GAMES.map(g => {
+    grid.innerHTML = GAMES.filter(g => g.onHome !== false).map(g => {
       const live    = g.status === 'live';
       const tagHtml = live
         ? `<div class="game-tag">LIVE</div>`

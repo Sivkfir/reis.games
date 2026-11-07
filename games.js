@@ -8,6 +8,7 @@
  *  4. That's it — the portal grid auto-renders from this file.
  *
  * STATUS VALUES: 'live' | 'coming-soon'
+ * onHome: false   hides a game from the homepage grid (its page stays online)
  * DIFFICULTY:    'easy' | 'medium' | 'hard'
  */
 
@@ -53,7 +54,46 @@ const GAMES = [
   },
 
   {
+    id: 'garden-viper',
+    title: 'Garden Viper',
+    slug: 'garden-viper',
+    tagline: 'Eat. Grow. Don\'t bite.',
+
+    descEn: 'The classic snake game, made smooth and modern. 3 modes, combos up to ×5 and golden bonuses!',
+    descHe: 'משחק הנחש הקלאסי, חלק ומודרני. 3 מצבים, קומבו עד ×5 ובונוסים של זהב!',
+
+    description: 'A modern snake game with smooth movement, three modes, combos and golden bonuses.',
+    longDescription: 'Garden Viper is the classic snake game rebuilt with smooth gliding movement. Eat apples to grow, chain them fast for up to a ×5 combo, and grab the golden star before it fades. Play Classic with deadly walls, Portal where the edges wrap around, or Maze with stones in your way. The faster you eat, the faster it gets.',
+
+    emoji: '🐍',
+    thumbBg: 'linear-gradient(135deg, #1d3d30 0%, #0e1c17 100%)',
+    thumbnail: '/garden-viper/thumb.svg',
+    ogImage: 'https://reis.games/logo-white.png',
+
+    category: 'arcade',
+    difficulty: 'easy',
+    status: 'live',
+    releaseDate: '2026-11',
+    version: '1.0',
+
+    url: 'garden-viper/index.html',
+
+    controls: {
+      keyboard: ['Arrow keys / WASD — Turn', 'SPACE — Start / Pause', '1 / 2 / 3 — Mode', 'M — Sound'],
+      touch:    ['Swipe the board or use the pad — Turn'],
+    },
+    tags: ['arcade', 'snake', 'classic', 'casual', 'score-attack'],
+    seo: {
+      title:       'Garden Viper — REI Games Studio',
+      description: 'A smooth, modern snake game with three modes, combos and golden bonuses. Free browser game by REI Games Studio.',
+      canonical:   'https://reis.games/garden-viper/',
+    },
+    related: ['gem-rush', 'rei-arena'],
+  },
+
+  {
     id: 'gem-rush',
+    onHome: false,   // hidden from the homepage grid (still playable at /gem-rush/). Delete this line to show it again.
     title: 'Gem Rush',
     slug: 'gem-rush',
     tagline: 'Catch gems. Keep the combo. Beat the clock.',
@@ -102,7 +142,7 @@ const GAMES = [
     description: 'A top-down 3v3 hero arena game. Pick a hero, team up with bots, and battle for gems.',
     longDescription: 'Rei Arena is a fast team battle game. Choose Spark, Boulder or Frost, each with their own attack and Super. Grab gems from the mine in the middle, hide in bushes, knock out the red team and hold 10 gems for 10 seconds to win. New heroes designed by Rei are coming soon!',
 
-    emoji: '⚔️',
+    emoji: '🦸',
     thumbBg: 'linear-gradient(135deg, #2b5a2f 0%, #16202b 100%)',
     thumbnail: '/rei-arena/thumb.svg',
     ogImage: 'https://reis.games/logo-white.png',
@@ -126,44 +166,6 @@ const GAMES = [
       canonical:   'https://reis.games/rei-arena/',
     },
     related: ['zombie-slayer', 'gem-rush'],
-  },
-
-  {
-    id: 'garden-viper',
-    title: 'Garden Viper',
-    slug: 'garden-viper',
-    tagline: 'Eat. Grow. Don\'t bite.',
-
-    descEn: 'The classic snake game, made smooth and modern. 3 modes, combos up to ×5 and golden bonuses!',
-    descHe: 'משחק הנחש הקלאסי, חלק ומודרני. 3 מצבים, קומבו עד ×5 ובונוסים של זהב!',
-
-    description: 'A modern snake game with smooth movement, three modes, combos and golden bonuses.',
-    longDescription: 'Garden Viper is the classic snake game rebuilt with smooth gliding movement. Eat apples to grow, chain them fast for up to a ×5 combo, and grab the golden star before it fades. Play Classic with deadly walls, Portal where the edges wrap around, or Maze with stones in your way. The faster you eat, the faster it gets.',
-
-    emoji: '🐍',
-    thumbBg: 'linear-gradient(135deg, #1d3d30 0%, #0e1c17 100%)',
-    thumbnail: '/garden-viper/thumb.svg',
-    ogImage: 'https://reis.games/logo-white.png',
-
-    category: 'arcade',
-    difficulty: 'easy',
-    status: 'live',
-    releaseDate: '2026-11',
-    version: '1.0',
-
-    url: 'garden-viper/index.html',
-
-    controls: {
-      keyboard: ['Arrow keys / WASD — Turn', 'SPACE — Start / Pause', '1 / 2 / 3 — Mode', 'M — Sound'],
-      touch:    ['Swipe the board or use the pad — Turn'],
-    },
-    tags: ['arcade', 'snake', 'classic', 'casual', 'score-attack'],
-    seo: {
-      title:       'Garden Viper — REI Games Studio',
-      description: 'A smooth, modern snake game with three modes, combos and golden bonuses. Free browser game by REI Games Studio.',
-      canonical:   'https://reis.games/garden-viper/',
-    },
-    related: ['gem-rush', 'rei-arena'],
   },
 
   {
